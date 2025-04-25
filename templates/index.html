@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Mapping Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4 text-white flex justify-between">
+        <a href="#" class="text-xl font-bold">Knowledge Maps</a>
+        <div>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="mr-4">Dashboard</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="mr-4">Login</a>
+                <a href="{{ url_for('register') }}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Welcome Section -->
+    <div class="flex flex-col items-center justify-center flex-grow text-center p-6">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to Knowledge Mapping</h1>
+        <p class="text-lg text-gray-600 mb-6 max-w-2xl">
+            Organize, visualize, and explore knowledge like never before. Join us to start mapping your ideas today!
+        </p>
+
+        <!-- Placeholder for Knowledge Map Image -->
+        <div class="w-full max-w-lg">
+            <img src="https://via.placeholder.com/600x300" alt="Knowledge Map Example" class="rounded-lg shadow-md w-full">
+        </div>
+
+        <!-- Login/Register Buttons -->
+        <div class="mt-6">
+            <a href="{{ url_for('login') }}" class="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 transition">
+                Login
+            </a>
+            <a href="{{ url_for('register') }}" class="ml-4 bg-gray-300 text-gray-800 px-6 py-3 rounded-lg shadow-md hover:bg-gray-400 transition">
+                Register
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

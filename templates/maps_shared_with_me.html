@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maps Shared With Me</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .star-rating {
+            color: #ddd;
+            font-size: 1.25rem;
+        }
+        .star-rating .filled {
+            color: #FFD700;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4 text-white flex justify-between">
+        <a href="#" class="text-xl font-bold">Knowledge Maps</a>
+        <div>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Map List -->
+    <div class="container mx-auto p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-semibold">Maps Shared With Me</h1>
+            <!-- Back to Dashboard Button -->
+            <a href="{{ url_for('dashboard') }}" 
+            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+            ← Back to Dashboard
+            </a>
+        </div>
+        
+        {% if shared_maps and shared_maps|length > 0 %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for map in shared_maps %}
+                <div class="bg-white p-4 shadow-md rounded-lg">
+                    <div class="flex justify-between items-start">
+                        <h2 class="text-lg font-semibold">{{ map.title }}</h2>
+                        <!-- Rating display -->
+                        <div class="flex items-center">
+                            <div class="star-rating mr-1" data-rating="{{ map.avg_rating or 0 }}">
+                                <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 1 else '' }}">★</span>
+                                <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 2 else '' }}">★</span>
+                                <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 3 else '' }}">★</span>
+                                <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 4 else '' }}">★</span>
+                                <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 5 else '' }}">★</span>
+                            </div>
+                            <span class="text-sm text-gray-500">({{ map.rating_count or 0 }})</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mt-1">{{ map.description }}</p>
+                    <p class="text-sm text-gray-500 mt-2">Shared by: {{ map.username }}</p>
+                    
+                    <!-- Open Button -->
+                    <div class="mt-4">
+                        <a href="{{ url_for('map_editor', map_id=map.map_id) }}" 
+                        class="bg-blue-500 text-white px-4 py-2 rounded text-center w-full block hover:bg-blue-600">Open</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white p-6 shadow-md rounded-lg text-center">
+                <p class="text-gray-600">No maps have been shared with you yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

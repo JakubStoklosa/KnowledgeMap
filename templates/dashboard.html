@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4 text-white flex justify-between">
+        <a href="#" class="text-xl font-bold">Knowledge Maps</a>
+        <div>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="container mx-auto p-6">
+        <h1 class="text-2xl font-semibold mb-4">Welcome, {{ current_user.username }}</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h2 class="text-xl font-medium mb-3">Your Maps</h2>
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Option to view personal knowledge maps -->
+                    <div>
+                        <a href="{{ url_for('view_personal_maps') }}" class="block bg-blue-500 text-white px-4 py-2 rounded text-center mb-4 hover:bg-blue-600">View Your Knowledge Maps</a>
+                    </div>
+
+                    <!-- Option to create a new knowledge map -->
+                    <div>
+                        <a href="{{ url_for('create_knowledge_map') }}" class="block bg-green-500 text-white px-4 py-2 rounded text-center mb-4 hover:bg-green-600">Create a New Knowledge Map</a>
+                    </div>
+
+                    <!-- Option to view other members' knowledge maps by ID -->
+                    <div>
+                        <a href="{{ url_for('enter_map_id') }}" class="block bg-yellow-500 text-white px-4 py-2 rounded text-center mb-4 hover:bg-yellow-600">Enter a Map ID</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h2 class="text-xl font-medium mb-3">Shared With You</h2>
+                <div>
+                    <a href="{{ url_for('maps_shared_with_me') }}" class="block bg-purple-500 text-white px-4 py-2 rounded text-center mb-4 hover:bg-purple-600">Maps Shared With Me</a>
+                </div>
+                
+                {% if shared_maps and shared_maps|length > 0 %}
+                    <div class="bg-white p-4 shadow-md rounded-lg">
+                        <h3 class="text-lg font-medium mb-2">Recently Shared Maps</h3>
+                        <ul>
+                            {% for map in shared_maps[:3] %}
+                                <li class="mb-2">
+                                    <a href="{{ url_for('map_editor', map_id=map.map_id) }}" class="text-blue-600 hover:underline">
+                                        {{ map.title }}
+                                    </a>
+                                    <span class="text-sm text-gray-500">shared by {{ map.username }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

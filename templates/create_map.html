@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Knowledge Map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4 text-white flex justify-between">
+        <a href="#" class="text-xl font-bold">Knowledge Maps</a>
+        <div>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+    <a href="{{ url_for('dashboard') }}" 
+    class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+    ← Back to Dashboard
+    </a>
+    <!-- Create Map Form -->
+    <div class="container mx-auto p-6">
+        <h1 class="text-2xl font-semibold mb-4">Create a New Knowledge Map</h1>
+        <form method="POST">
+            <div class="mb-4">
+                <label for="title" class="block text-sm font-medium text-gray-700">Map Title</label>
+                <input type="text" name="title" id="title" class="mt-1 p-2 w-full border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea name="description" id="description" class="mt-1 p-2 w-full border rounded" required></textarea>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">Create Map</button>
+        </form>
+    </div>
+</body>
+</html>

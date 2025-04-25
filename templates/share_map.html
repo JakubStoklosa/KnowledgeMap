@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Knowledge Map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-blue-600 p-4 text-white flex justify-between">
+        <a href="#" class="text-xl font-bold">Knowledge Maps</a>
+        <div>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Share Map Content -->
+    <div class="container mx-auto p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-semibold">Share Map: {{ map_title }}</h1>
+            <a href="{{ url_for('map_editor', map_id=map_id) }}" 
+               class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                ← Back to Map
+            </a>
+        </div>
+        
+        <div class="bg-white p-6 shadow-md rounded-lg">
+            <p class="mb-4">Select users to share this map with:</p>
+            
+            <form action="{{ url_for('share_map', map_id=map_id) }}" method="POST">
+                <div class="mb-4">
+                    <input type="text" id="search" placeholder="Search users..." class="w-full p-2 border rounded">
+                </div>
+                
+                <div class="max-h-96 overflow-y-auto border rounded p-2">
+                    <ul class="user-list">
+                        {% for user in users %}
+                            <li class="flex items-center p-2 hover:bg-gray-100 {% if loop.index % 2 == 0 %}bg-gray-50{% endif %}">
+                                <input type="checkbox" name="selected_users" value="{{ user.id }}" id="user-{{ user.id }}" 
+                                       class="mr-3" {% if user.id in shared_with %}checked{% endif %}>
+                                <label for="user-{{ user.id }}" class="w-full cursor-pointer">{{ user.username }}</label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <div class="mt-4 flex justify-end">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Share Map
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Simple search filtering
+        document.getElementById('search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const userItems = document.querySelectorAll('.user-list li');
+            
+            userItems.forEach(item => {
+                const username = item.querySelector('label').textContent.toLowerCase();
+                if (username.includes(searchTerm)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

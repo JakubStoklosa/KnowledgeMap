@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Knowledge Map Editor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="top-bar">
+        <h1 class="map-title">{{ map_title }}</h1>
+        <span class="map-author">by {{ author_name }}</span>
+        <div class="map-rating">
+            <div id="average-rating-stars" data-rating="{{ average_rating }}" data-raters='{{ raters_data | tojson | safe }}'></div>
+            <span id="rating-count" style="cursor: pointer;">
+                ({{ rating_count }})
+            </span>
+        </div>
+    </div>
+    <div id="zoom-controls">
+        <button id="zoom-in">Zoom In +</button>
+        <button id="zoom-out">Zoom Out -</button>
+    </div>
+
+    <div id="map-id-display">
+        Map ID: <span id="display-map-id">{{ map_id }}</span>
+        <button onclick="copyMapId()">Copy</button>
+        <button id="share-map-btn">Share Map</button>
+
+        <!-- Add this script at the bottom of your file -->
+        <script>
+        document.getElementById('share-map-btn').addEventListener('click', function() {
+            window.location.href = "{{ url_for('share_map', map_id=map_id) }}";
+        });
+        </script>
+    </div>
+
+    <div id="control-panel">
+        <!-- Node Form -->
+        <div id="node-form">
+            <h3>Create Node</h3>
+            <input type="text" id="node-label" placeholder="Node Label">
+            <textarea id="node-description" placeholder="Node Description"></textarea>
+
+            <label for="node-shape">Shape:</label>
+            <select id="node-shape">
+                <option value="circle">Circle</option>
+                <option value="square">Square</option>
+            </select>
+
+            <label for="node-color">Color:</label>
+            <select id="node-color">
+                <option value="steelblue">Steel Blue</option>
+                <option value="red">Red</option>
+                <option value="green">Green</option>
+                <option value="orange">Orange</option>
+                <option value="purple">Purple</option>
+            </select>
+
+            <button onclick="createNode()">Add Node</button>
+            <button id="delete-mode-btn">Delete</button>
+        </div>
+
+        <!-- Map Tools -->
+        <div id="control-buttons" style="margin-top: 20px;">
+            <button id="link-mode">Link Mode Off</button>
+
+            <label for="link-type">Link Type:</label>
+            <select id="link-type">
+                <option value="line">Straight Line</option>
+                <option value="arrow">Arrow</option>
+            </select>
+
+            <button id="save-map">Save Map</button>
+            <button id="undo-action">Undo</button>
+        </div>
+
+        <!-- Editors -->
+        <div style="margin-top: 20px;">
+            <button id="view-editors-btn">View Editors ({{ editors_data|length }})</button>
+            <div id="editors-dropdown" style="display:none;">
+                <ul>
+                    {% if editors_data and editors_data|length > 0 %}
+                        {% for editor in editors_data %}
+                            <li>{{ editor }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li>No editors yet</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="map-container"></div>
+
+    <!-- Resize Popups -->
+    <div id="resize-popup">
+        <div id="popup-description" style="margin-bottom: 5px; font-size: 12px; color: #555;"></div>
+        <button id="increase-size">＋</button>
+        <button id="decrease-size">－</button>
+    </div>
+
+    <!-- Back to Maps Button -->
+    <div id="back-to-maps-container">
+        <button id="back-to-maps-btn">← Back to Maps</button>
+    </div>
+
+    <!-- 🔗 Load the JavaScript file here -->
+<!-- Hidden div that stores the Flask-rendered data -->
+    <div id="map-data"
+        data-map-id="{{ map_id }}"
+        data-nodes='{{ nodes_data | tojson | safe }}'
+        data-links='{{ links_data | tojson | safe }}'>
+    </div>
+
+    <div id="rating-container">
+        <div id="rating-display">
+            <div id="average-rating-stars" data-rating="{{ average_rating }}" data-raters='{{ raters_data | tojson | safe }}'></div>
+            <span id="rating-count" style="cursor: pointer; color: #333; font-size: 14px; margin-left: 5px;">
+            </span>
+        </div>
+        
+        <div id="rater-list" style="display: none; background: white; border: 1px solid #ccc; padding: 10px; margin-top: 5px; border-radius: 6px;">
+            <ul id="rater-list-items"></ul>
+        </div>
+        <button id="rate-map-btn">Rate Map</button>
+    </div>
+    
+    <!-- Rating Modal -->
+    <div id="rating-popup" style="display:none;">
+        <span class="star" data-value="1">☆</span>
+        <span class="star" data-value="2">☆</span>
+        <span class="star" data-value="3">☆</span>
+        <span class="star" data-value="4">☆</span>
+        <span class="star" data-value="5">☆</span>
+    </div>
+    
+
+
+    <script src="{{ url_for('static', filename='map_editor_clean.js') }}"></script>
+</body>
+</html>
+
