@@ -3,63 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Knowledge Maps</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>View Knowledge Map</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        .star-rating {
-            color: #ddd;
-            font-size: 1.25rem;
+        /* Custom styles for view_maps.html */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            color: #2c3e50;
         }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        
+        .nav-link:hover {
+            color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 7rem 2rem 4rem;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+            margin: 0;
+        }
+
+        .back-button {
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background-color: #718096;
+            color: white;
+            border: 2px solid #718096;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            background-color: #4a5568;
+            border-color: #4a5568;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(74, 85, 104, 0.4);
+        }
+
+        .maps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .map-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .map-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .star-rating {
+            display: flex;
+            color: #e2e8f0;
+        }
+
         .star-rating .filled {
-            color: #FFD700;
+            color: #f39c12;
+        }
+
+        .rating-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .rating-count {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-left: 0.5rem;
+        }
+
+        .map-description {
+            color: #4a5568;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .map-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        .open-button, .delete-button {
+            padding: 0.7rem 0;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-align: center;
+            flex: 1;
+        }
+
+        .open-button {
+            background-color: #3498db;
+            color: white;
+            border: 2px solid #3498db;
+        }
+
+        .open-button:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .delete-button {
+            background-color: #e53e3e;
+            color: white;
+            border: 2px solid #e53e3e;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #c53030;
+            border-color: #c53030;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(229, 62, 62, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .maps-grid {
+                grid-template-columns: 1fr; /* mobile: 1 card per row */
+            }
+        
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body>
     <!-- Navbar -->
-    <nav class="bg-blue-600 p-4 text-white flex justify-between">
-        <a href="#" class="text-xl font-bold">Knowledge Maps</a>
-        <div>
-            <a href="{{ url_for('logout') }}">Logout</a>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('dashboard') }}" class="navbar-brand">Knowledge Mapping</a>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+            </div>
         </div>
     </nav>
 
     <!-- Map List -->
-    <div class="container mx-auto p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h1 class="text-2xl font-semibold">Your Knowledge Maps</h1>
-            <!-- Back to Dashboard Button -->
-            <a href="{{ url_for('dashboard') }}" 
-            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-            ← Back to Dashboard
-            </a>
+    <div class="container">
+        <div class="header-container">
+            <h1 class="page-title">Your Knowledge Maps</h1>
         </div>
         
-        <div class="grid grid-cols-3 gap-4">
+        <div class="maps-grid">
             {% for map in maps %}
-            <div class="bg-white p-4 shadow-md rounded-lg">
-                <div class="flex justify-between items-start">
-                    <h2 class="text-lg font-semibold">{{ map.title if map.title else map[1] }}</h2>
+            <div class="map-card">
+                <div class="map-header">
+                    <h2 class="map-title">{{ map.title if map.title else map[1] }}</h2>
                     <!-- Rating display -->
-                    <div class="flex items-center">
-                        <div class="star-rating mr-1" data-rating="{{ map.avg_rating if map.avg_rating else map[3] or 0 }}">
+                    <div class="rating-container">
+                        <div class="star-rating">
                             <span class="{{ 'filled' if (map.avg_rating if map.avg_rating else map[3] or 0) >= 1 else '' }}">★</span>
                             <span class="{{ 'filled' if (map.avg_rating if map.avg_rating else map[3] or 0) >= 2 else '' }}">★</span>
                             <span class="{{ 'filled' if (map.avg_rating if map.avg_rating else map[3] or 0) >= 3 else '' }}">★</span>
                             <span class="{{ 'filled' if (map.avg_rating if map.avg_rating else map[3] or 0) >= 4 else '' }}">★</span>
                             <span class="{{ 'filled' if (map.avg_rating if map.avg_rating else map[3] or 0) >= 5 else '' }}">★</span>
                         </div>
-                        <span class="text-sm text-gray-500">({{ map.rating_count if map.rating_count else map[4] or 0 }})</span>
+                        <span class="rating-count">({{ map.rating_count if map.rating_count else map[4] or 0 }})</span>
                     </div>
                 </div>
-                <p class="text-gray-600 mt-2">{{ map.description if map.description else map[2] }}</p>
+                <p class="map-description">{{ map.description if map.description else map[2] }}</p>
                 
                 <!-- Buttons for Open and Delete -->
-                <div class="mt-4 flex space-x-2">
+                <div class="map-actions">
                     <a href="{{ url_for('map_editor', map_id=map.map_id if map.map_id else map[0]) }}" 
-                    class="bg-blue-500 text-white px-4 py-2 rounded text-center hover:bg-blue-600">Open</a>
+                    class="open-button">Open</a>
                     <button onclick="deleteMap('{{ map.map_id if map.map_id else map[0] }}')" 
-                            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Delete</button>
+                            class="delete-button">Delete</button>
                 </div>
             </div>
             {% endfor %}

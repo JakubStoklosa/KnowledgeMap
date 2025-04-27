@@ -35,51 +35,55 @@
         </script>
     </div>
 
-    <div id="control-panel">
-        <!-- Node Form -->
-        <div id="node-form">
-            <h3>Create Node</h3>
-            <input type="text" id="node-label" placeholder="Node Label">
-            <textarea id="node-description" placeholder="Node Description"></textarea>
+        <div id="control-panel">
+            <div class="control-section">
+                <button id="add-node-btn" class="primary-button">Add Node</button>
+            </div>
+            
+            <div class="control-section">
+                <div class="toggle-container">
+                    <label class="toggle-label">Link Mode</label>
+                    <label class="switch">
+                        <input type="checkbox" id="link-mode-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div id="link-type-container" style="display: none;">
+                    <div class="form-group">
+                        <label for="link-type">Link Type:</label>
+                        <select id="link-type">
+                            <option value="line">Straight Line</option>
+                            <option value="arrow">Arrow</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <button id="undo-action" class="secondary-button">Undo</button>
+            </div>
+            
+            <div class="control-section">
+                <div class="toggle-container">
+                    <label class="toggle-label">Delete Mode</label>
+                    <label class="switch">
+                        <input type="checkbox" id="delete-mode-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <button id="save-map" class="success-button">Save Map</button>
+            </div>
 
-            <label for="node-shape">Shape:</label>
-            <select id="node-shape">
-                <option value="circle">Circle</option>
-                <option value="square">Square</option>
-            </select>
+            <div class="control-section">
+                <button id="rate-map-btn">Rate Map</button>
+            </div>
 
-            <label for="node-color">Color:</label>
-            <select id="node-color">
-                <option value="steelblue">Steel Blue</option>
-                <option value="red">Red</option>
-                <option value="green">Green</option>
-                <option value="orange">Orange</option>
-                <option value="purple">Purple</option>
-            </select>
-
-            <button onclick="createNode()">Add Node</button>
-            <button id="delete-mode-btn">Delete</button>
-        </div>
-
-        <!-- Map Tools -->
-        <div id="control-buttons" style="margin-top: 20px;">
-            <button id="link-mode">Link Mode Off</button>
-
-            <label for="link-type">Link Type:</label>
-            <select id="link-type">
-                <option value="line">Straight Line</option>
-                <option value="arrow">Arrow</option>
-            </select>
-
-            <button id="save-map">Save Map</button>
-            <button id="undo-action">Undo</button>
-        </div>
-
-        <!-- Editors -->
-        <div style="margin-top: 20px;">
-            <button id="view-editors-btn">View Editors ({{ editors_data|length }})</button>
-            <div id="editors-dropdown" style="display:none;">
-                <ul>
+            <div class="spaced-section">
+                <button id="view-editors-btn">View Editors ({{ editors_data|length }})</button>
+                <ul id="editors-list" style="display:none;">
                     {% if editors_data and editors_data|length > 0 %}
                         {% for editor in editors_data %}
                             <li>{{ editor }}</li>
@@ -91,12 +95,13 @@
             </div>
         </div>
     </div>
+    </div>
 
     <div id="map-container"></div>
 
     <!-- Resize Popups -->
     <div id="resize-popup">
-        <div id="popup-description" style="margin-bottom: 5px; font-size: 12px; color: #555;"></div>
+        <div id="popup-description"></div>
         <button id="increase-size">＋</button>
         <button id="decrease-size">－</button>
     </div>
@@ -106,25 +111,23 @@
         <button id="back-to-maps-btn">← Back to Maps</button>
     </div>
 
-    <!-- 🔗 Load the JavaScript file here -->
-<!-- Hidden div that stores the Flask-rendered data -->
     <div id="map-data"
         data-map-id="{{ map_id }}"
         data-nodes='{{ nodes_data | tojson | safe }}'
-        data-links='{{ links_data | tojson | safe }}'>
+        data-links='{{ links_data | tojson | safe }}'
+        data-editors='{{ editors_data | tojson | safe }}'>
     </div>
 
     <div id="rating-container">
         <div id="rating-display">
             <div id="average-rating-stars" data-rating="{{ average_rating }}" data-raters='{{ raters_data | tojson | safe }}'></div>
-            <span id="rating-count" style="cursor: pointer; color: #333; font-size: 14px; margin-left: 5px;">
+            <span id="rating-count">
             </span>
         </div>
         
-        <div id="rater-list" style="display: none; background: white; border: 1px solid #ccc; padding: 10px; margin-top: 5px; border-radius: 6px;">
+        <div id="rater-list">
             <ul id="rater-list-items"></ul>
         </div>
-        <button id="rate-map-btn">Rate Map</button>
     </div>
     
     <!-- Rating Modal -->
@@ -136,9 +139,43 @@
         <span class="star" data-value="5">☆</span>
     </div>
     
+    <!-- Add this somewhere in your edit_map.html body -->
+<div id="node-popup" class="modal-popup" style="display: none;">
+    <div class="popup-content">
+        <h3>Create Node</h3>
+        <div class="form-group">
+            <label for="node-label">Label:</label>
+            <input type="text" id="node-label" placeholder="Node Label">
+        </div>
+        <div class="form-group">
+            <label for="node-description">Description:</label>
+            <textarea id="node-description" placeholder="Node Description"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="node-shape">Shape:</label>
+            <select id="node-shape">
+                <option value="circle">Circle</option>
+                <option value="square">Square</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="node-color">Color:</label>
+            <select id="node-color">
+                <option value="steelblue">Steel Blue</option>
+                <option value="red">Red</option>
+                <option value="green">Green</option>
+                <option value="orange">Orange</option>
+                <option value="purple">Purple</option>
+            </select>
+        </div>
+        <div class="popup-buttons">
+            <button id="add-node-confirm">Add Node</button>
+            <button id="add-node-cancel">Cancel</button>
+        </div>
+    </div>
+</div>
 
 
     <script src="{{ url_for('static', filename='map_editor_clean.js') }}"></script>
 </body>
 </html>
-

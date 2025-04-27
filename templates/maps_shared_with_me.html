@@ -4,69 +4,292 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maps Shared With Me</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        .star-rating {
-            color: #ddd;
-            font-size: 1.25rem;
+        /* Custom styles matching view_maps.html */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            color: #2c3e50;
         }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        
+        .nav-link:hover {
+            color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 7rem 2rem 4rem;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+            margin: 0;
+        }
+
+        .back-button {
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background-color: #718096;
+            color: white;
+            border: 2px solid #718096;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            background-color: #4a5568;
+            border-color: #4a5568;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(74, 85, 104, 0.4);
+        }
+
+        .maps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .map-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .map-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .star-rating {
+            display: flex;
+            color: #e2e8f0;
+        }
+
         .star-rating .filled {
-            color: #FFD700;
+            color: #f39c12;
+        }
+
+        .rating-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .rating-count {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-left: 0.5rem;
+        }
+
+        .map-description {
+            color: #4a5568;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        
+        .map-author {
+            color: #718096;
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .map-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        .open-button, .primary-button {
+            padding: 0.7rem 0;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-align: center;
+            flex: 1;
+            background-color: #3498db;
+            color: white;
+            border: 2px solid #3498db;
+        }
+
+        .open-button:hover, .primary-button:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-top: 2rem;
+        }
+
+        .empty-state p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .maps-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body>
     <!-- Navbar -->
-    <nav class="bg-blue-600 p-4 text-white flex justify-between">
-        <a href="#" class="text-xl font-bold">Knowledge Maps</a>
-        <div>
-            <a href="{{ url_for('logout') }}">Logout</a>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('dashboard') }}" class="navbar-brand">Knowledge Mapping</a>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+            </div>
         </div>
     </nav>
 
     <!-- Map List -->
-    <div class="container mx-auto p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h1 class="text-2xl font-semibold">Maps Shared With Me</h1>
-            <!-- Back to Dashboard Button -->
-            <a href="{{ url_for('dashboard') }}" 
-            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-            ← Back to Dashboard
-            </a>
+    <div class="container">
+        <div class="header-container">
+            <h1 class="page-title">Maps Shared With Me</h1>
         </div>
         
         {% if shared_maps and shared_maps|length > 0 %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="maps-grid">
                 {% for map in shared_maps %}
-                <div class="bg-white p-4 shadow-md rounded-lg">
-                    <div class="flex justify-between items-start">
-                        <h2 class="text-lg font-semibold">{{ map.title }}</h2>
+                <div class="map-card">
+                    <div class="map-header">
+                        <h2 class="map-title">{{ map.title }}</h2>
                         <!-- Rating display -->
-                        <div class="flex items-center">
-                            <div class="star-rating mr-1" data-rating="{{ map.avg_rating or 0 }}">
+                        <div class="rating-container">
+                            <div class="star-rating">
                                 <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 1 else '' }}">★</span>
                                 <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 2 else '' }}">★</span>
                                 <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 3 else '' }}">★</span>
                                 <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 4 else '' }}">★</span>
                                 <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 5 else '' }}">★</span>
                             </div>
-                            <span class="text-sm text-gray-500">({{ map.rating_count or 0 }})</span>
+                            <span class="rating-count">({{ map.rating_count or 0 }})</span>
                         </div>
                     </div>
-                    <p class="text-gray-600 mt-1">{{ map.description }}</p>
-                    <p class="text-sm text-gray-500 mt-2">Shared by: {{ map.username }}</p>
+                    <p class="map-description">{{ map.description }}</p>
+                    <p class="map-author">Shared by: {{ map.username }}</p>
                     
                     <!-- Open Button -->
-                    <div class="mt-4">
-                        <a href="{{ url_for('map_editor', map_id=map.map_id) }}" 
-                        class="bg-blue-500 text-white px-4 py-2 rounded text-center w-full block hover:bg-blue-600">Open</a>
+                    <div class="map-actions">
+                        <a href="{{ url_for('map_editor', map_id=map.map_id) }}" class="open-button">Open</a>
                     </div>
                 </div>
                 {% endfor %}
             </div>
         {% else %}
-            <div class="bg-white p-6 shadow-md rounded-lg text-center">
-                <p class="text-gray-600">No maps have been shared with you yet.</p>
+            <div class="empty-state">
+                <p>No maps have been shared with you yet.</p>
             </div>
         {% endif %}
     </div>

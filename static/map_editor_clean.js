@@ -4,6 +4,23 @@ const mapDataElement = document.getElementById("map-data");
 const mapId = mapDataElement.getAttribute("data-map-id");
 let nodes = JSON.parse(mapDataElement.getAttribute("data-nodes"));
 let links = JSON.parse(mapDataElement.getAttribute("data-links"));
+
+// Fix for editors data - ensure it's properly retrieved
+let editorsData;
+try {
+    // Attempt to get editors data from data attribute
+    editorsData = JSON.parse(mapDataElement.getAttribute("data-editors") || "[]");
+} catch (e) {
+    // If parsing fails, try to get data from the rendered list
+    editorsData = [];
+    const listItems = document.querySelectorAll("#editors-list li");
+    listItems.forEach(item => {
+        if (item.textContent !== "No editors yet") {
+            editorsData.push(item.textContent);
+        }
+    });
+}
+
 const labelToNode = {};
 nodes.forEach(n => labelToNode[n.label] = n);
 links = links.map(l => ({ 
@@ -20,28 +37,75 @@ let actionHistory = [];
 let selectedResizableNode = null;
 let selectedResizableLink = null;
 
+
+
+// Populate editors list
+const editorsList = document.getElementById("editors-list");
+if (editorsData && editorsData.length > 0) {
+    editorsData.forEach(editor => {
+        const li = document.createElement("li");
+        li.textContent = editor;
+        editorsList.appendChild(li);
+    });
+} else {
+    const li = document.createElement("li");
+    li.textContent = "No editors yet";
+    editorsList.appendChild(li);
+}
+
 // Ensure resize popup is properly styled
 const resizePopup = document.getElementById("resize-popup");
-
 
 // Create link resize popup
 const linkResizePopup = document.createElement("div");
 linkResizePopup.id = "link-resize-popup";
 
-
 // Create buttons for link resizing
 const increaseLinkButton = document.createElement("button");
 increaseLinkButton.textContent = "+";
 
-
 const decreaseLinkButton = document.createElement("button");
 decreaseLinkButton.textContent = "-";
-
 
 // Add buttons to the link resize popup
 linkResizePopup.appendChild(increaseLinkButton);
 linkResizePopup.appendChild(decreaseLinkButton);
 document.body.appendChild(linkResizePopup);
+
+// Event Listeners for Add Node popup
+document.getElementById("add-node-btn").addEventListener("click", function() {
+    document.getElementById("node-popup").style.display = "flex";
+    // Clear form fields
+    document.getElementById("node-label").value = "";
+    document.getElementById("node-description").value = "";
+    document.getElementById("node-shape").value = "circle";
+    document.getElementById("node-color").value = "steelblue";
+});
+
+document.getElementById("add-node-cancel").addEventListener("click", function() {
+    document.getElementById("node-popup").style.display = "none";
+});
+
+document.getElementById("add-node-confirm").addEventListener("click", function() {
+    createNode();
+    document.getElementById("node-popup").style.display = "none";
+});
+
+// Link Mode Toggle
+document.getElementById("link-mode-toggle").addEventListener("change", function() {
+    isLinkMode = this.checked;
+    document.getElementById("link-type-container").style.display = isLinkMode ? "block" : "none";
+    
+    // Reset source node when turning off link mode
+    if (!isLinkMode) {
+        selectedSourceNode = null;
+    }
+});
+
+// Delete Mode Toggle
+document.getElementById("delete-mode-toggle").addEventListener("change", function() {
+    isDeleteMode = this.checked;
+});
 
 // Add resize button event listeners
 document.getElementById("increase-size").addEventListener("click", function(event) {
@@ -66,7 +130,6 @@ document.getElementById("increase-size").addEventListener("click", function(even
             // ✅ Save size to data
             selectedResizableNode.data.size = { width: newWidth, height: newHeight };
         }
-        
     }
 });
 
@@ -132,11 +195,18 @@ document.addEventListener("click", function(event) {
     }
 });
 
-
 // Dropdown toggle
+// Simple toggle for editors list
 document.getElementById("view-editors-btn").addEventListener("click", function() {
-    const dropdown = document.getElementById("editors-dropdown");
-    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+    const editorsList = document.getElementById("editors-list");
+    if (editorsList) {
+        // Simple toggle - if it's hidden, show it, otherwise hide it
+        if (editorsList.style.display === "none") {
+            editorsList.style.display = "block";
+        } else {
+            editorsList.style.display = "none";
+        }
+    }
 });
 
 // Copy map ID
@@ -167,7 +237,7 @@ svg.call(zoom);
 svg.append("defs").append("marker")
     .attr("id", "arrowhead")
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 30)
+    .attr("refX", 15) // Reduced so it appears at the edge of the node
     .attr("refY", 0)
     .attr("markerWidth", 6)
     .attr("markerHeight", 6)
@@ -218,12 +288,41 @@ function updateVisualization() {
         }
     });
 
-    // Add node labels and descriptions
     nodeEnter.append("text")
-        .attr("class", "node-label")
-        .attr("dy", 4)
-        .text(d => d.label);
-    
+    .attr("class", "node-label")
+    .attr("text-anchor", "middle")
+    .attr("dy", 0)
+    .each(function(d) {
+        const self = d3.select(this);
+        const words = d.label.split(/\s+/).reverse();
+        let word;
+        let line = [];
+        let lineNumber = 0;
+        const lineHeight = 1.1; // ems
+        const y = self.attr("y");
+        const dy = parseFloat(self.attr("dy"));
+        let tspan = self.append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+
+        const maxWidth = d.shape === "square" 
+            ? (d.size?.width || 60) * 0.8 
+            : (d.size || 35) * 1.5; // slightly wider for circles
+
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > maxWidth) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = self.append("tspan")
+                    .attr("x", 0)
+                    .attr("y", y)
+                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                    .text(word);
+            }
+        }
+    });
+
     nodeEnter.append("title")
         .text(d => d.description);
     
@@ -256,15 +355,154 @@ function updateVisualization() {
     updateSimulationLinks();
 }
 
+// Calculate intersection point of a line and a circle
+function intersectCircleLine(cx, cy, r, x1, y1, x2, y2) {
+    // Vector from line start to circle center
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    
+    // Calculate distance from point 1 to point 2
+    const len = Math.sqrt(dx * dx + dy * dy);
+    
+    // Normalize the direction vector
+    const nx = dx / len;
+    const ny = dy / len;
+    
+    // Calculate the intersection point
+    const intersectX = cx - r * nx;
+    const intersectY = cy - r * ny;
+    
+    return { x: intersectX, y: intersectY };
+}
+
+// Calculate intersection of a line and a rectangle
+function intersectRectLine(rx, ry, rw, rh, x1, y1, x2, y2) {
+    // Rectangle corners
+    const left = rx - rw / 2;
+    const right = rx + rw / 2;
+    const top = ry - rh / 2;
+    const bottom = ry + rh / 2;
+    
+    // Direction vector
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    
+    // Time of intersection with each edge
+    const txMin = dx !== 0 ? (left - x1) / dx : Infinity;
+    const txMax = dx !== 0 ? (right - x1) / dx : Infinity;
+    const tyMin = dy !== 0 ? (top - y1) / dy : Infinity;
+    const tyMax = dy !== 0 ? (bottom - y1) / dy : Infinity;
+    
+    // Find the first intersection
+    const tMin = Math.max(Math.min(txMin, txMax), Math.min(tyMin, tyMax));
+    const tMax = Math.min(Math.max(txMin, txMax), Math.max(tyMin, tyMax));
+    
+    if (tMin <= tMax && tMax >= 0) {
+        // Use tMin if the line comes from outside the rectangle
+        const t = tMin >= 0 ? tMin : tMax;
+        return {
+            x: x1 + t * dx,
+            y: y1 + t * dy
+        };
+    }
+    
+    // Fallback to center if no intersection found
+    return { x: rx, y: ry };
+}
+
+function getNodeShape(node) {
+    const element = svgGroup.selectAll(".node").filter(d => d === node).node();
+    if (!element) return null;
+    
+    if (node.shape === "square") {
+        const rect = d3.select(element).select("rect");
+        if (!rect.empty()) {
+            return {
+                type: "rect",
+                width: +rect.attr("width"),
+                height: +rect.attr("height")
+            };
+        }
+    } else {
+        const circle = d3.select(element).select("circle");
+        if (!circle.empty()) {
+            return {
+                type: "circle",
+                radius: +circle.attr("r")
+            };
+        }
+    }
+    return null;
+}
+
 function ticked() {
+    // Update node positions
     svgGroup.selectAll(".node")
         .attr("transform", d => `translate(${d.x},${d.y})`);
     
-    svgGroup.selectAll(".link")
-        .attr("x1", d => d.source.x)
-        .attr("y1", d => d.source.y)
-        .attr("x2", d => d.target.x)
-        .attr("y2", d => d.target.y);
+    // Update link positions with edge connections
+    svgGroup.selectAll(".link").each(function(d) {
+        const link = d3.select(this);
+        
+        // Get shapes for both source and target nodes
+        const sourceShape = getNodeShape(d.source);
+        const targetShape = getNodeShape(d.target);
+        
+        if (!sourceShape || !targetShape) return;
+        
+        // Calculate direction vector from source to target
+        const dx = d.target.x - d.source.x;
+        const dy = d.target.y - d.source.y;
+        
+        // Source node edge point
+        let sourceX = d.source.x;
+        let sourceY = d.source.y;
+        
+        // Target node edge point
+        let targetX = d.target.x;
+        let targetY = d.target.y;
+        
+        // Calculate intersections based on shape types
+        if (sourceShape.type === "circle") {
+            const intersection = intersectCircleLine(
+                d.source.x, d.source.y, sourceShape.radius,
+                d.target.x, d.target.y, d.source.x, d.source.y
+            );
+            sourceX = intersection.x;
+            sourceY = intersection.y;
+        } else if (sourceShape.type === "rect") {
+            const intersection = intersectRectLine(
+                d.source.x, d.source.y, 
+                sourceShape.width, sourceShape.height,
+                d.target.x, d.target.y, d.source.x, d.source.y
+            );
+            sourceX = intersection.x;
+            sourceY = intersection.y;
+        }
+        
+        if (targetShape.type === "circle") {
+            const intersection = intersectCircleLine(
+                d.target.x, d.target.y, targetShape.radius,
+                d.source.x, d.source.y, d.target.x, d.target.y
+            );
+            targetX = intersection.x;
+            targetY = intersection.y;
+        } else if (targetShape.type === "rect") {
+            const intersection = intersectRectLine(
+                d.target.x, d.target.y, 
+                targetShape.width, targetShape.height,
+                d.source.x, d.source.y, d.target.x, d.target.y
+            );
+            targetX = intersection.x;
+            targetY = intersection.y;
+        }
+        
+        // Update link
+        link.attr("x1", sourceX)
+            .attr("y1", sourceY)
+            .attr("x2", targetX)
+            .attr("y2", targetY);
+    });
 }
 
 function nodeClicked(event, node, element) {
@@ -313,7 +551,6 @@ function nodeClicked(event, node, element) {
         element: element,
         shape: node.shape,
         data: node
-
     };
     
     // Position the resize popup near the node
@@ -401,16 +638,6 @@ function dragended(event, d) {
     d.fy = null;
 }
 
-document.getElementById('delete-mode-btn').addEventListener('click', function() {
-    isDeleteMode = !isDeleteMode;
-    document.getElementById('delete-mode-btn').textContent = isDeleteMode ? 'Delete: ON' : 'Delete';
-});
-
-document.getElementById('link-mode').addEventListener('click', function() {
-    isLinkMode = !isLinkMode;
-    document.getElementById('link-mode').textContent = isLinkMode ? 'Link Mode On' : 'Link Mode Off';
-});
-
 document.getElementById('undo-action').addEventListener('click', function() {
     const lastAction = actionHistory.pop();
     if (!lastAction) return;
@@ -465,7 +692,6 @@ document.getElementById('save-map').addEventListener('click', function() {
                     size
                 };
             }),
-
             
             links: links.map(l => ({
                 sourceLabel: l.source.label,
@@ -544,9 +770,11 @@ rateButton.addEventListener("click", () => {
         ratingPopup.style.display = "none";
         return;
     }
+    
+    // Get button position for popup positioning
     const rect = rateButton.getBoundingClientRect();
-    ratingPopup.style.left = `${rect.left}px`;
-    ratingPopup.style.top = `${rect.bottom + 5}px`;
+    ratingPopup.style.left = `${rect.right + 10}px`; // Position to the right of the button
+    ratingPopup.style.top = `${rect.top}px`; // Align with top of button
     ratingPopup.style.display = "block";
 });
 
@@ -579,17 +807,13 @@ ratingCountSpan.addEventListener('click', () => {
 });
 
 // Populate rater list
-const ratersData = JSON.parse(document.getElementById('average-rating-stars').getAttribute('data-raters'));
+const ratersData = JSON.parse(document.getElementById('average-rating-stars').getAttribute('data-raters') || "[]");
 ratersData.forEach(rater => {
     const li = document.createElement('li');
     li.textContent = `${rater.username}: ${rater.rating} star${rater.rating !== 1 ? 's' : ''}`;
     raterListItems.appendChild(li);
 });
 
-
-
 updateVisualization();
 console.log("Visualization initialized with", nodes.length, "nodes and", links.length, "links");
-    updateVisualization();
-
-    
+updateVisualization();

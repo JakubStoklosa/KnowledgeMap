@@ -22,8 +22,10 @@ login_manager.login_view = "login"
 
 # User model for Flask-Login
 class User(UserMixin):
-    def __init__(self, id):
+    def __init__(self, id, username):
         self.id = id
+        self.username = username
+
 
 # Database connection function to avoid repetition
 def get_db_connection():
@@ -40,14 +42,15 @@ def get_db_connection():
 def load_user(user_id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    cur.execute("SELECT id, username FROM users WHERE id = %s", (user_id,))
     user = cur.fetchone()
     cur.close()
     conn.close()
     
     if user:
-        return User(user[0])
+        return User(id=user[0], username=user[1])
     return None
+
 
 # Routes
 @app.route("/")
@@ -69,7 +72,7 @@ def login():
         
         # Check if user exists and password is correct
         if user and bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):  # index 2 for password_hash
-            user_obj = User(user[0])  # user[0] is the user id
+            user_obj = User(id=user[0], username=user[1])
             login_user(user_obj)
             return redirect(url_for("dashboard"))
         else:
@@ -128,7 +131,8 @@ def dashboard():
     cur.close()
     conn.close()
     
-    return render_template("dashboard.html", shared_maps=shared_maps)
+    return render_template("dashboard.html", shared_maps=shared_maps, current_user=current_user)
+
 
 @app.route("/view_personal_maps")
 @login_required
