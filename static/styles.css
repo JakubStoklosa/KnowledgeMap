@@ -470,15 +470,22 @@ svg {
 
 /* View Editors Button */
 #view-editors-btn {
-    background-color: #4299e1;
+    position: static;
+    top: 50px;
+    right: 20px;
+    z-index: 999;
+    padding: 8px 15px;
+    font-size: 14px;
+    background-color: #3498db;
     color: white;
-    padding: 10px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.2s ease;
-    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Match other sidebar buttons */
+    margin-top: 5px; /* Add some spacing */
 }
 
 #view-editors-btn:hover {
@@ -683,8 +690,8 @@ svg {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     display: none;
     white-space: nowrap;
-    left: 300px; /* Position it to the right of the sidebar */
-    top: 50%; /* Center it vertically */
+    left: 300px;
+    top: 50%;
 }
 
 #rating-popup .star {
@@ -776,3 +783,19 @@ svg {
     border-left: 3px solid #e53e3e;
 }
 
+/* Legend styles */
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid;
+    background-color: white;
+    margin-right: 10px;
+    display: inline-block;
+}

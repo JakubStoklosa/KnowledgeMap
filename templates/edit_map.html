@@ -17,11 +17,11 @@
             </span>
         </div>
     </div>
+    
     <div id="zoom-controls">
         <button id="zoom-in">Zoom In +</button>
         <button id="zoom-out">Zoom Out -</button>
     </div>
-
     <div id="map-id-display">
         Map ID: <span id="display-map-id">{{ map_id }}</span>
         <button onclick="copyMapId()">Copy</button>
@@ -36,11 +36,25 @@
     </div>
 
         <div id="control-panel">
-            <div class="control-section">
-                <button id="add-node-btn" class="primary-button">Add Node</button>
+            <div class="spaced-section">
+                <h3>Node Legend</h3>
+                <div class="legend-item">
+                    <div class="legend-color" style="border-color: steelblue;"></div>
+                    <span>Blue - Mastered Skill</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="border-color: green;"></div>
+                    <span>Green - Working On</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="border-color: orange;"></div>
+                    <span>Orange - Prerequisite</span>
+                </div>
             </div>
             
             <div class="control-section">
+                <button id="add-node-btn" class="primary-button">Add Node</button>
+
                 <div class="toggle-container">
                     <label class="toggle-label">Link Mode</label>
                     <label class="switch">
@@ -57,13 +71,6 @@
                         </select>
                     </div>
                 </div>
-            </div>
-            
-            <div class="control-section">
-                <button id="undo-action" class="secondary-button">Undo</button>
-            </div>
-            
-            <div class="control-section">
                 <div class="toggle-container">
                     <label class="toggle-label">Delete Mode</label>
                     <label class="switch">
@@ -71,17 +78,12 @@
                         <span class="slider round"></span>
                     </label>
                 </div>
+                <button id="undo-action" class="secondary-button">Undo</button>
             </div>
-            
+
             <div class="control-section">
                 <button id="save-map" class="success-button">Save Map</button>
-            </div>
-
-            <div class="control-section">
                 <button id="rate-map-btn">Rate Map</button>
-            </div>
-
-            <div class="spaced-section">
                 <button id="view-editors-btn">View Editors ({{ editors_data|length }})</button>
                 <ul id="editors-list" style="display:none;">
                     {% if editors_data and editors_data|length > 0 %}

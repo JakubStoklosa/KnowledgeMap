@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,6 +89,13 @@
             gap: 2rem;
         }
 
+        /* Admin dashboard changes - 3 columns for admin */
+        .admin-dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+        }
+
         .dashboard-section {
             background-color: white;
             border-radius: 10px;
@@ -116,7 +124,7 @@
             gap: 1rem;
         }
 
-        .primary-button, .success-button, .warning-button, .info-button {
+        .primary-button, .success-button, .warning-button, .info-button, .danger-button {
             padding: 0.8rem 1.5rem;
             border-radius: 50px;
             font-weight: 600;
@@ -183,6 +191,19 @@
             box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4);
         }
 
+        .danger-button {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        .danger-button:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
         .map-card {
             background-color: #f8fafc;
             border-radius: 8px;
@@ -235,8 +256,21 @@
             font-style: italic;
         }
 
+        /* Admin section badge */
+        .admin-badge {
+            background-color: #e74c3c;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         @media (max-width: 768px) {
-            .dashboard-grid {
+            .dashboard-grid, .admin-dashboard-grid {
                 grid-template-columns: 1fr;
             }
             
@@ -257,8 +291,77 @@
 
     <!-- Dashboard Content -->
     <div class="container">
-        <h1 class="page-title">Welcome, {{ current_user.username }}</h1>
+        <h1 class="page-title">
+            Welcome, {{ current_user.username }}
+            {% if current_user.username == 'Admin' %}
+            <span class="admin-badge">Administrator</span>
+            {% endif %}
+        </h1>
         
+        {% if current_user.username == 'Admin' %}
+        <!-- Admin Dashboard with 3 columns -->
+        <div class="admin-dashboard-grid">
+            <div class="dashboard-section">
+                <h2 class="section-title">Your Maps</h2>
+                <div class="action-buttons">
+                    <!-- Option to view personal knowledge maps -->
+                    <div>
+                        <a href="{{ url_for('view_personal_maps') }}" class="primary-button">View Your Knowledge Maps</a>
+                    </div>
+
+                    <!-- Option to create a new knowledge map -->
+                    <div>
+                        <a href="{{ url_for('create_knowledge_map') }}" class="success-button">Create a New Knowledge Map</a>
+                    </div>
+
+                    <!-- Option to view other members' knowledge maps by ID -->
+                    <div>
+                        <a href="{{ url_for('enter_map_id') }}" class="warning-button">Enter a Map ID</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-section">
+                <h2 class="section-title">Shared With You</h2>
+                <div>
+                    <a href="{{ url_for('maps_shared_with_me') }}" class="info-button">Maps Shared With Me</a>
+                </div>
+                
+                {% if shared_maps and shared_maps|length > 0 %}
+                    <div class="map-card">
+                        <h3 class="card-title">Recently Shared Maps</h3>
+                        <ul class="map-list">
+                            {% for map in shared_maps[:3] %}
+                                <li class="map-list-item">
+                                    <a href="{{ url_for('map_editor', map_id=map.map_id) }}" class="map-link">
+                                        {{ map.title }}
+                                    </a>
+                                    <span class="map-author">shared by {{ map.username }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Admin Section -->
+            <div class="dashboard-section">
+                <h2 class="section-title">Admin Controls</h2>
+                <div class="action-buttons">
+                    <div>
+                        <a href="{{ url_for('admin_manage_users') }}" class="danger-button">Manage Users</a>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('admin_manage_maps') }}" class="danger-button">Manage Maps</a>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('admin_statistics') }}" class="primary-button">System Statistics</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Regular Dashboard with 2 columns -->
         <div class="dashboard-grid">
             <div class="dashboard-section">
                 <h2 class="section-title">Your Maps</h2>
@@ -303,6 +406,7 @@
                 {% endif %}
             </div>
         </div>
+        {% endif %}
     </div>
 </body>
 </html>

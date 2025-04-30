@@ -5,13 +5,10 @@ const mapId = mapDataElement.getAttribute("data-map-id");
 let nodes = JSON.parse(mapDataElement.getAttribute("data-nodes"));
 let links = JSON.parse(mapDataElement.getAttribute("data-links"));
 
-// Fix for editors data - ensure it's properly retrieved
 let editorsData;
 try {
-    // Attempt to get editors data from data attribute
     editorsData = JSON.parse(mapDataElement.getAttribute("data-editors") || "[]");
 } catch (e) {
-    // If parsing fails, try to get data from the rendered list
     editorsData = [];
     const listItems = document.querySelectorAll("#editors-list li");
     listItems.forEach(item => {
@@ -39,7 +36,6 @@ let selectedResizableLink = null;
 
 
 
-// Populate editors list
 const editorsList = document.getElementById("editors-list");
 if (editorsData && editorsData.length > 0) {
     editorsData.forEach(editor => {
@@ -91,23 +87,19 @@ document.getElementById("add-node-confirm").addEventListener("click", function()
     document.getElementById("node-popup").style.display = "none";
 });
 
-// Link Mode Toggle
 document.getElementById("link-mode-toggle").addEventListener("change", function() {
     isLinkMode = this.checked;
     document.getElementById("link-type-container").style.display = isLinkMode ? "block" : "none";
     
-    // Reset source node when turning off link mode
     if (!isLinkMode) {
         selectedSourceNode = null;
     }
 });
 
-// Delete Mode Toggle
 document.getElementById("delete-mode-toggle").addEventListener("change", function() {
     isDeleteMode = this.checked;
 });
 
-// Add resize button event listeners
 document.getElementById("increase-size").addEventListener("click", function(event) {
     event.stopPropagation();
     console.log("Increase size clicked");
@@ -119,7 +111,6 @@ document.getElementById("increase-size").addEventListener("click", function(even
             const newRadius = +circle.attr("r") + 5;
             circle.attr("r", newRadius);
         
-            // ✅ Save size to data
             selectedResizableNode.data.size = newRadius;
         } else {
             const rect = d3.select(selectedResizableNode.element).select("rect");
@@ -127,7 +118,6 @@ document.getElementById("increase-size").addEventListener("click", function(even
             const newHeight = +rect.attr("height") + 5;
             rect.attr("width", newWidth).attr("height", newHeight);
         
-            // ✅ Save size to data
             selectedResizableNode.data.size = { width: newWidth, height: newHeight };
         }
     }
@@ -177,13 +167,11 @@ decreaseLinkButton.addEventListener("click", function(event) {
     }
 });
 
-// Function to update link distances in the simulation
 function updateSimulationLinks() {
     simulation.force("link", d3.forceLink(links).distance(d => d.distance));
     simulation.alpha(0.3).restart();
 }
 
-// Hide popups when clicking elsewhere
 document.addEventListener("click", function(event) {
     if (!resizePopup.contains(event.target)) {
         resizePopup.style.display = "none";
@@ -195,12 +183,9 @@ document.addEventListener("click", function(event) {
     }
 });
 
-// Dropdown toggle
-// Simple toggle for editors list
 document.getElementById("view-editors-btn").addEventListener("click", function() {
     const editorsList = document.getElementById("editors-list");
     if (editorsList) {
-        // Simple toggle - if it's hidden, show it, otherwise hide it
         if (editorsList.style.display === "none") {
             editorsList.style.display = "block";
         } else {
@@ -252,10 +237,8 @@ const simulation = d3.forceSimulation(nodes)
     .on("tick", ticked);
 
 function updateVisualization() {
-    // Update nodes
     const nodeElements = svgGroup.selectAll(".node").data(nodes, d => d.id);
     
-    // Enter new nodes
     const nodeEnter = nodeElements.enter()
         .append("g")
         .attr("class", "node")
@@ -264,12 +247,11 @@ function updateVisualization() {
             .on("drag", dragged)
             .on("end", dragended));
     
-    // Add node click behavior explicitly
     nodeEnter.on("click", function(event, node) {
         nodeClicked(event, node, this);
     });
     
-    // Add shapes based on node type
+
     nodeEnter.each(function(d) {
         if (d.shape === "square") {
             const width = d.size?.width || 60;
@@ -279,12 +261,16 @@ function updateVisualization() {
                 .attr("y", -height / 2)
                 .attr("width", width)
                 .attr("height", height)
-                .attr("fill", d.color);
+                .attr("fill", "white")
+                .attr("stroke", d.color)
+                .attr("stroke-width", 3);
         } else {
             const radius = d.size || 35;
             d3.select(this).append("circle")
                 .attr("r", radius)
-                .attr("fill", d.color);
+                .attr("fill", "white")
+                .attr("stroke", d.color)
+                .attr("stroke-width", 3); 
         }
     });
 
@@ -298,14 +284,14 @@ function updateVisualization() {
         let word;
         let line = [];
         let lineNumber = 0;
-        const lineHeight = 1.1; // ems
+        const lineHeight = 1.1; 
         const y = self.attr("y");
         const dy = parseFloat(self.attr("dy"));
         let tspan = self.append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
 
         const maxWidth = d.shape === "square" 
             ? (d.size?.width || 60) * 0.8 
-            : (d.size || 35) * 1.5; // slightly wider for circles
+            : (d.size || 35) * 1.5;
 
         while (word = words.pop()) {
             line.push(word);
@@ -326,13 +312,10 @@ function updateVisualization() {
     nodeEnter.append("title")
         .text(d => d.description);
     
-    // Remove old nodes
     nodeElements.exit().remove();
 
-    // Update links
     const linkElements = svgGroup.selectAll(".link").data(links);
     
-    // Enter new links
     const linkEnter = linkElements.enter()
         .append("line")
         .attr("class", "link")
@@ -342,15 +325,14 @@ function updateVisualization() {
         .merge(linkElements)
         .attr("marker-end", d => d.type === 'arrow' ? 'url(#arrowhead)' : null);
     
-    // Add click event for links
     linkEnter.on("click", function(event, link) {
         linkClicked(event, link, this);
     });
     
-    // Remove old links
     linkElements.exit().remove();
 
-    // Update simulation
+
+
     simulation.nodes(nodes);
     updateSimulationLinks();
 }
@@ -375,30 +357,24 @@ function intersectCircleLine(cx, cy, r, x1, y1, x2, y2) {
     return { x: intersectX, y: intersectY };
 }
 
-// Calculate intersection of a line and a rectangle
 function intersectRectLine(rx, ry, rw, rh, x1, y1, x2, y2) {
-    // Rectangle corners
     const left = rx - rw / 2;
     const right = rx + rw / 2;
     const top = ry - rh / 2;
     const bottom = ry + rh / 2;
     
-    // Direction vector
     const dx = x2 - x1;
     const dy = y2 - y1;
     
-    // Time of intersection with each edge
     const txMin = dx !== 0 ? (left - x1) / dx : Infinity;
     const txMax = dx !== 0 ? (right - x1) / dx : Infinity;
     const tyMin = dy !== 0 ? (top - y1) / dy : Infinity;
     const tyMax = dy !== 0 ? (bottom - y1) / dy : Infinity;
     
-    // Find the first intersection
     const tMin = Math.max(Math.min(txMin, txMax), Math.min(tyMin, tyMax));
     const tMax = Math.min(Math.max(txMin, txMax), Math.max(tyMin, tyMax));
     
     if (tMin <= tMax && tMax >= 0) {
-        // Use tMin if the line comes from outside the rectangle
         const t = tMin >= 0 ? tMin : tMax;
         return {
             x: x1 + t * dx,
@@ -406,7 +382,6 @@ function intersectRectLine(rx, ry, rw, rh, x1, y1, x2, y2) {
         };
     }
     
-    // Fallback to center if no intersection found
     return { x: rx, y: ry };
 }
 
@@ -436,33 +411,26 @@ function getNodeShape(node) {
 }
 
 function ticked() {
-    // Update node positions
     svgGroup.selectAll(".node")
         .attr("transform", d => `translate(${d.x},${d.y})`);
     
-    // Update link positions with edge connections
     svgGroup.selectAll(".link").each(function(d) {
         const link = d3.select(this);
         
-        // Get shapes for both source and target nodes
         const sourceShape = getNodeShape(d.source);
         const targetShape = getNodeShape(d.target);
         
         if (!sourceShape || !targetShape) return;
         
-        // Calculate direction vector from source to target
         const dx = d.target.x - d.source.x;
         const dy = d.target.y - d.source.y;
         
-        // Source node edge point
         let sourceX = d.source.x;
         let sourceY = d.source.y;
         
-        // Target node edge point
         let targetX = d.target.x;
         let targetY = d.target.y;
         
-        // Calculate intersections based on shape types
         if (sourceShape.type === "circle") {
             const intersection = intersectCircleLine(
                 d.source.x, d.source.y, sourceShape.radius,
@@ -497,7 +465,6 @@ function ticked() {
             targetY = intersection.y;
         }
         
-        // Update link
         link.attr("x1", sourceX)
             .attr("y1", sourceY)
             .attr("x2", targetX)
@@ -509,10 +476,8 @@ function nodeClicked(event, node, element) {
     console.log("Node clicked:", node);
     console.log("isLinkMode:", isLinkMode, "isDeleteMode:", isDeleteMode);
     
-    // Hide link resize popup first
     selectedResizableLink = null;
     
-    // Handle node deletion
     if (isDeleteMode) {
         console.log("Deleting node:", node);
         nodes = nodes.filter(n => n !== node);
@@ -523,7 +488,6 @@ function nodeClicked(event, node, element) {
         return;
     }
 
-    // Handle link creation
     if (isLinkMode) {
         if (selectedSourceNode) {
             console.log("Creating link from", selectedSourceNode, "to", node);
@@ -545,7 +509,6 @@ function nodeClicked(event, node, element) {
         return;
     }
 
-    // Handle node resize (when not in link or delete mode)
     console.log("Showing resize popup for node:", node);
     selectedResizableNode = {
         element: element,
@@ -566,7 +529,6 @@ function nodeClicked(event, node, element) {
     const descriptionDiv = document.getElementById("popup-description");
     descriptionDiv.textContent = node.description || "No description available";
     resizePopup.style.display = "block";
-    // Stop event propagation
     event.stopPropagation();
 }
 
@@ -589,7 +551,6 @@ function linkClicked(event, link, element) {
         return;
     }
     
-    // Handle link resizing
     console.log("Showing resize popup for link");
     selectedResizableLink = {
         element: element,
@@ -697,7 +658,7 @@ document.getElementById('save-map').addEventListener('click', function() {
                 sourceLabel: l.source.label,
                 targetLabel: l.target.label,
                 type: l.type || 'line',
-                distance: l.distance || 100  // Save the custom distance
+                distance: l.distance || 100 
             }))
         })
     })
@@ -790,7 +751,7 @@ document.querySelectorAll("#rating-popup .star").forEach(star => {
             if (data.status === "success") {
                 alert("Thanks for rating!");
                 ratingPopup.style.display = "none";
-                location.reload();  // reload to show new average
+                location.reload();
             }
         });
     });

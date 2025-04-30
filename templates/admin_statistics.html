@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - System Statistics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            color: #2c3e50;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        
+        .nav-link:hover {
+            color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 7rem 2rem 4rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            border-bottom: 3px solid #e74c3c;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+        .admin-badge {
+            background-color: #e74c3c;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 1rem;
+            vertical-align: middle;
+        }
+
+        .stats-panel {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .trend-up {
+            color: #10b981;
+        }
+
+        .trend-down {
+            color: #ef4444;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+
+        .coming-soon {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+        
+        .highlighted-stat {
+            background-color: #ebf5ff;
+            border-left: 4px solid #3498db;
+        }
+        
+        .achievement-card {
+            background-color: #fef9c3;
+            border-left: 4px solid #eab308;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('dashboard') }}" class="navbar-brand">Knowledge Mapping</a>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Content -->
+    <div class="container">
+        <h1 class="page-title">
+            System Statistics
+            <span class="admin-badge">Administrator</span>
+        </h1>
+
+        <a href="{{ url_for('dashboard') }}" class="back-button">
+            &larr; Back to Dashboard
+        </a>
+
+        <div class="stats-panel">
+            <h2 class="stats-section-title">User Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value">{{ user_count }}</div>
+                    <div class="stat-trend trend-up">+5% from last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">New Users (Last 30 Days)</div>
+                    <div class="stat-value">{{ new_users }}</div>
+                    <div class="stat-trend trend-up">+12% from previous period</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Users</div>
+                    <div class="stat-value">{{ active_users }}</div>
+                    <div class="stat-trend trend-up">+8% from last month</div>
+                </div>
+                <div class="stat-card achievement-card">
+                    <div class="stat-label">Most Active Map Creator</div>
+                    <div class="stat-value">{{ most_active_creator_name }}</div>
+                    <div class="stat-trend">Created {{ most_active_creator_count }} maps</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <h2 class="stats-section-title">Content Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Maps</div>
+                    <div class="stat-value">{{ map_count }}</div>
+                    <div class="stat-trend trend-up">+15% from last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Nodes</div>
+                    <div class="stat-value">{{ node_count }}</div>
+                    <div class="stat-trend trend-up">+23% from last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Links</div>
+                    <div class="stat-value">{{ link_count }}</div>
+                    <div class="stat-trend trend-up">+19% from last month</div>
+                </div>
+                <div class="stat-card highlighted-stat">
+                    <div class="stat-label">Avg. Nodes per Map</div>
+                    <div class="stat-value">{{ avg_nodes_per_map }}</div>
+                    <div class="stat-trend trend-up">+5% from last month</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <h2 class="stats-section-title">System Activity</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Maps Created (Last 30 Days)</div>
+                    <div class="stat-value">{{ maps_created }}</div>
+                    <div class="stat-trend trend-up">+10% from previous period</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Maps Shared (Last 30 Days)</div>
+                    <div class="stat-value">{{ maps_shared }}</div>
+                    <div class="stat-trend trend-up">+32% from previous period</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Nodes Created (Last 30 Days)</div>
+                    <div class="stat-value">{{ nodes_last_30_days }}</div>
+                    <div class="stat-trend trend-up">+18% from previous period</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg. Rating</div>
+                    <div class="stat-value">{{ avg_rating }}</div>
+                    <div class="stat-trend trend-up">+0.3 from last month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

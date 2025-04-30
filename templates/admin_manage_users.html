@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Users</title>
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            color: #2c3e50;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        
+        .nav-link:hover {
+            color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 7rem 2rem 4rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            border-bottom: 3px solid #e74c3c;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+        .admin-panel {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        /* Users table styles */
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .users-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: #4a5568;
+            position: sticky;
+            top: 0;
+        }
+        
+        .users-table th.actions-header {
+            text-align: right;
+        }
+
+        .users-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Action buttons column always right-aligned */
+        .users-table td.actions-cell {
+            text-align: right;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .modal-message {
+            margin-bottom: 1.5rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .cancel-button {
+            background-color: #6c757d;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .confirm-button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Button styles */
+        .button {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+        }
+
+        .view-button {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .view-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .delete-button {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .delete-button:hover {
+            background-color: #c0392b;
+        }
+
+        .admin-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-input {
+            padding: 0.6rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            min-width: 250px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .search-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 1rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .search-button:hover {
+            background-color: #2980b9;
+        }
+
+        .user-count {
+            color: #718096;
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-top: 1rem;
+        }
+
+        .admin-badge {
+            background-color: #e74c3c;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('dashboard') }}" class="navbar-brand">Knowledge Mapping</a>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Content -->
+    <div class="container">
+        <h1 class="page-title">Manage Users</h1>
+        
+        <div class="admin-panel">
+            <div class="admin-actions">
+                <a href="{{ url_for('dashboard') }}" class="back-button">
+                    &larr; Back to Dashboard
+                </a>
+                <form class="search-form" method="GET">
+                    <input type="text" name="search" placeholder="Search users..." class="search-input" value="{{ search }}">
+                    <button type="submit" class="search-button">Search</button>
+                </form>
+            </div>
+
+            <div class="admin-section-title">User List</div>
+            
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Maps</th>
+                        <th class="actions-header">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2</td>
+                        <td>
+                            Admin
+                            <span class="admin-badge">Admin</span>
+                        </td>
+                        <td>5</td>
+                        <td class="actions-cell">
+                            <!-- No delete button for Admin -->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Jakub</td>
+                        <td>3</td>
+                        <td class="actions-cell">
+                            <button class="button delete-button" onclick="confirmDelete('1', 'Jakub')">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="user-count">Showing 2 users</div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Delete User</h2>
+            <p class="modal-message">Are you sure you want to delete user <strong id="deleteUsername"></strong>? This action cannot be undone and all their maps will be permanently deleted.</p>
+            <div class="modal-actions">
+                <button class="cancel-button" onclick="closeModal()">Cancel</button>
+                <form id="deleteForm" action="#" method="POST" style="display: inline;">
+                    <input type="hidden" id="deleteUserId" name="user_id">
+                    <button type="submit" class="confirm-button">Delete User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmDelete(userId, username) {
+            document.getElementById('deleteUserId').value = userId;
+            document.getElementById('deleteUsername').textContent = username;
+            document.getElementById('deleteModal').style.display = 'block';
+            
+            // Set the form action dynamically
+            document.getElementById('deleteForm').action = '/admin/delete_user/' + userId;
+        }
+        
+        function closeModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('deleteModal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

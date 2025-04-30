@@ -1,7 +1,5 @@
--- Create the database
 CREATE DATABASE knowledge_mapping;
 
--- Use the created database
 USE knowledge_mapping;
 
 DROP TABLE IF EXISTS relationships;
@@ -11,17 +9,15 @@ DROP TABLE IF EXISTS maps;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS editors;
 
--- Create the users table
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,  -- Changed to match app.py
+    password_hash VARCHAR(255) NOT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the maps table (Using UUIDs)
 CREATE TABLE maps (
-    map_id VARCHAR(36) PRIMARY KEY,  -- Renamed id to map_id for consistency
+    map_id VARCHAR(36) PRIMARY KEY,
     user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -29,19 +25,17 @@ CREATE TABLE maps (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Create the nodes table
 CREATE TABLE nodes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     map_id VARCHAR(36) NOT NULL,  
     label VARCHAR(255) NOT NULL,  
     description TEXT,
-    position_x FLOAT DEFAULT 0,   -- Position for visualization
+    position_x FLOAT DEFAULT 0, 
     position_y FLOAT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (map_id) REFERENCES maps(map_id) ON DELETE CASCADE  -- Updated reference
+    FOREIGN KEY (map_id) REFERENCES maps(map_id) ON DELETE CASCADE
 );
 
--- Create the links table (formerly relationships)
 CREATE TABLE links (
     id INT AUTO_INCREMENT PRIMARY KEY,
     map_id VARCHAR(255) NOT NULL,
@@ -52,15 +46,14 @@ CREATE TABLE links (
     FOREIGN KEY (target_node_id) REFERENCES nodes(id) ON DELETE CASCADE
 );
 
--- Create the editors table with UNIQUE constraint
 CREATE TABLE editors (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    map_id VARCHAR(36),  -- Should match the type of map_id in the maps table
+    map_id VARCHAR(36), 
     user_id INT,
     edited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (map_id) REFERENCES maps(map_id) ON DELETE CASCADE,  -- Added ON DELETE CASCADE
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,    -- Added ON DELETE CASCADE
-    UNIQUE(map_id, user_id)  -- Added UNIQUE constraint to prevent duplicate entries
+    FOREIGN KEY (map_id) REFERENCES maps(map_id) ON DELETE CASCADE, 
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,   
+    UNIQUE(map_id, user_id)  
 );
 
 CREATE TABLE ratings (
