@@ -154,8 +154,20 @@ def admin_manage_users():
     
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, username FROM users ORDER BY username")
-    users = [{"id": row[0], "username": row[1]} for row in cur.fetchall()]
+    
+    cur.execute("""
+        SELECT u.id, u.username, COUNT(m.map_id) as map_count
+        FROM users u
+        LEFT JOIN maps m ON u.id = m.user_id
+        GROUP BY u.id, u.username
+        ORDER BY u.username
+    """)
+    
+    users = [{"id": row[0], 
+              "username": row[1], 
+              "maps_count": row[2],
+              "is_admin": row[1] == 'Admin'} for row in cur.fetchall()]
+    
     cur.close()
     conn.close()
     
@@ -190,23 +202,34 @@ def admin_view_user_maps(user_id):
 
     return render_template("admin_user_maps.html", maps=maps, username=username)
 
-@app.route('/admin/delete_user', methods=['POST'])
+@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @login_required
-def admin_delete_user():
+def admin_delete_user(user_id):
     if current_user.username != 'Admin':
-        return redirect(url_for('dashboard'))
-    
-    user_id = request.form.get('user_id', type=int)
-    if not user_id:
-        flash("No user ID provided.", "danger")
-        return redirect(url_for('admin_manage_users'))
+        return jsonify({
+            'success': False,
+            'message': 'Unauthorized access'
+        }), 403
     
     conn = get_db_connection()
     cur = conn.cursor()
 
     try:
+        # Get username before deletion for the success message
+        cur.execute("SELECT username FROM users WHERE id = %s", (user_id,))
+        user_result = cur.fetchone()
+        if not user_result:
+            return jsonify({
+                'success': False,
+                'message': 'User not found'
+            }), 404
+        
+        username = user_result[0]
+
+        # First, delete all maps and related data
         cur.execute("SELECT map_id FROM maps WHERE user_id = %s", (user_id,))
         map_ids = [row[0] for row in cur.fetchall()]
+        
         for map_id in map_ids:
             cur.execute("DELETE FROM links WHERE map_id = %s", (map_id,))
             cur.execute("DELETE FROM nodes WHERE map_id = %s", (map_id,))
@@ -214,21 +237,31 @@ def admin_delete_user():
             cur.execute("DELETE FROM ratings WHERE map_id = %s", (map_id,))
             cur.execute("DELETE FROM maps WHERE map_id = %s", (map_id,))
 
+        # Then delete user-related data
         cur.execute("DELETE FROM shared_maps WHERE shared_with_id = %s", (user_id,))
         cur.execute("DELETE FROM ratings WHERE user_id = %s", (user_id,))
         cur.execute("DELETE FROM editors WHERE user_id = %s", (user_id,))
         cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
 
         conn.commit()
-        flash("User and associated data deleted.", "success")
+        
+        return jsonify({
+            'success': True,
+            'message': f'User {username} has been deleted successfully.',
+            'deletedUserId': user_id,
+            'deletedUsername': username
+        })
+
     except Exception as e:
         conn.rollback()
-        flash(f"Error deleting user: {e}", "danger")
+        return jsonify({
+            'success': False,
+            'message': f'Error deleting user: {str(e)}'
+        }), 500
+
     finally:
         cur.close()
         conn.close()
-
-    return redirect(url_for('admin_manage_users'))
 
 @app.route('/admin/statistics')
 @login_required
@@ -391,12 +424,14 @@ def map_editor(map_id):
                 conn.rollback()
 
     cur.execute("""
-        SELECT DISTINCT u.username FROM editors e
+        SELECT DISTINCT u.username 
+        FROM editors e
         JOIN users u ON e.user_id = u.id
-        WHERE e.map_id = %s
-    """, (map_id,))
-    editors_data = [row[0] for row in cur.fetchall()]
+        WHERE e.map_id = %s AND e.user_id != %s
+        ORDER BY u.username
+    """, (map_id, author_id))
     
+    editors_data = [row[0] for row in cur.fetchall()]
     print(f"Editors for map {map_id}: {editors_data}")
 
     cur.execute("SELECT id, label, description, position_x, position_y, shape, color, size FROM nodes WHERE map_id = %s", (map_id,))
@@ -544,7 +579,7 @@ def edit_knowledge_map(map_id):
     author_result = cur.fetchone()
     author_name = author_result[0] if author_result else "Unknown"
     
-    cur.execute("SELECT user_id, rating FROM map_ratings WHERE map_id = %s", (map_id,))
+    cur.execute("SELECT user_id, rating FROM ratings WHERE map_id = %s", (map_id,))
     rating_data = cur.fetchall()
     
     if rating_data:
@@ -562,7 +597,7 @@ def edit_knowledge_map(map_id):
     
     rating_count = len(rating_data)
     
-    cur.execute("SELECT DISTINCT u.username FROM map_editors e JOIN users u ON e.user_id = u.id WHERE e.map_id = %s", (map_id,))
+    cur.execute("SELECT DISTINCT u.username FROM editors e JOIN users u ON e.user_id = u.id WHERE e.map_id = %s", (map_id,))
     editors_data = [editor[0] for editor in cur.fetchall()]
     
     if not editors_data:

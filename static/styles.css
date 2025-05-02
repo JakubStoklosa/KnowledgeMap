@@ -91,9 +91,7 @@ body {
     background-color: white;
     transition: .4s;
 }
-/* Add these styles to your styles.css file */
 
-/* Modal Popup */
 .modal-popup {
     position: fixed;
     top: 0;
@@ -101,7 +99,7 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    display: none; /* Initially hidden */
+    display: none; 
     justify-content: center;
     align-items: center;
     z-index: 2000;
@@ -151,7 +149,6 @@ body {
     box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
 }
 
-/* Ensure editors list is properly styled */
 #editors-list {
     margin: 10px 0 0 0;
     padding-left: 20px;

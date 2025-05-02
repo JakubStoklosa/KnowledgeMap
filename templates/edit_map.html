@@ -27,7 +27,6 @@
         <button onclick="copyMapId()">Copy</button>
         <button id="share-map-btn">Share Map</button>
 
-        <!-- Add this script at the bottom of your file -->
         <script>
         document.getElementById('share-map-btn').addEventListener('click', function() {
             window.location.href = "{{ url_for('share_map', map_id=map_id) }}";
@@ -86,13 +85,6 @@
                 <button id="rate-map-btn">Rate Map</button>
                 <button id="view-editors-btn">View Editors ({{ editors_data|length }})</button>
                 <ul id="editors-list" style="display:none;">
-                    {% if editors_data and editors_data|length > 0 %}
-                        {% for editor in editors_data %}
-                            <li>{{ editor }}</li>
-                        {% endfor %}
-                    {% else %}
-                        <li>No editors yet</li>
-                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -176,6 +168,7 @@
         </div>
     </div>
 </div>
+
 
 
     <script src="{{ url_for('static', filename='map_editor_clean.js') }}"></script>

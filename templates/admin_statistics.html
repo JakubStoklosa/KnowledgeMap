@@ -6,7 +6,6 @@
     <title>Admin - System Statistics</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Custom styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f9fafb;
@@ -93,34 +92,42 @@
             vertical-align: middle;
         }
 
+        /* New stats panels layout */
+        .stats-panels-container {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
         .stats-panel {
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 1.5rem;
+            flex: 1;
+            min-width: 300px;
         }
 
         .stats-section-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: #2c3e50;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid #e2e8f0;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
         }
 
         .stat-card {
             background-color: #f8fafc;
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 1rem;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -131,13 +138,13 @@
         }
 
         .stat-label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #64748b;
             margin-bottom: 0.5rem;
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: #2c3e50;
         }
@@ -199,6 +206,17 @@
             background-color: #fef9c3;
             border-left: 4px solid #eab308;
         }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .stats-panels-container {
+                flex-direction: column;
+            }
+            
+            .stats-panel {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -224,80 +242,63 @@
             &larr; Back to Dashboard
         </a>
 
-        <div class="stats-panel">
-            <h2 class="stats-section-title">User Statistics</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Users</div>
-                    <div class="stat-value">{{ user_count }}</div>
-                    <div class="stat-trend trend-up">+5% from last month</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">New Users (Last 30 Days)</div>
-                    <div class="stat-value">{{ new_users }}</div>
-                    <div class="stat-trend trend-up">+12% from previous period</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Active Users</div>
-                    <div class="stat-value">{{ active_users }}</div>
-                    <div class="stat-trend trend-up">+8% from last month</div>
-                </div>
-                <div class="stat-card achievement-card">
-                    <div class="stat-label">Most Active Map Creator</div>
-                    <div class="stat-value">{{ most_active_creator_name }}</div>
-                    <div class="stat-trend">Created {{ most_active_creator_count }} maps</div>
+        <!-- New side-by-side layout for stats panels -->
+        <div class="stats-panels-container">
+            <div class="stats-panel">
+                <h2 class="stats-section-title">User Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Users</div>
+                        <div class="stat-value">{{ user_count }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">New Users (Last 30 Days)</div>
+                        <div class="stat-value">{{ new_users }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Active Users</div>
+                        <div class="stat-value">{{ active_users }}</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="stats-panel">
-            <h2 class="stats-section-title">Content Statistics</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Maps</div>
-                    <div class="stat-value">{{ map_count }}</div>
-                    <div class="stat-trend trend-up">+15% from last month</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Nodes</div>
-                    <div class="stat-value">{{ node_count }}</div>
-                    <div class="stat-trend trend-up">+23% from last month</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Links</div>
-                    <div class="stat-value">{{ link_count }}</div>
-                    <div class="stat-trend trend-up">+19% from last month</div>
-                </div>
-                <div class="stat-card highlighted-stat">
-                    <div class="stat-label">Avg. Nodes per Map</div>
-                    <div class="stat-value">{{ avg_nodes_per_map }}</div>
-                    <div class="stat-trend trend-up">+5% from last month</div>
+            <div class="stats-panel">
+                <h2 class="stats-section-title">Content Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Maps</div>
+                        <div class="stat-value">{{ map_count }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Nodes</div>
+                        <div class="stat-value">{{ node_count }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Links</div>
+                        <div class="stat-value">{{ link_count }}</div>
+                    </div>
+                    <div class="stat-card highlighted-stat">
+                        <div class="stat-label">Avg. Nodes per Map</div>
+                        <div class="stat-value">{{ avg_nodes_per_map }}</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="stats-panel">
-            <h2 class="stats-section-title">System Activity</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Maps Created (Last 30 Days)</div>
-                    <div class="stat-value">{{ maps_created }}</div>
-                    <div class="stat-trend trend-up">+10% from previous period</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Maps Shared (Last 30 Days)</div>
-                    <div class="stat-value">{{ maps_shared }}</div>
-                    <div class="stat-trend trend-up">+32% from previous period</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Nodes Created (Last 30 Days)</div>
-                    <div class="stat-value">{{ nodes_last_30_days }}</div>
-                    <div class="stat-trend trend-up">+18% from previous period</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Avg. Rating</div>
-                    <div class="stat-value">{{ avg_rating }}</div>
-                    <div class="stat-trend trend-up">+0.3 from last month</div>
+            <div class="stats-panel">
+                <h2 class="stats-section-title">System Activity</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Maps Created (Last 30 Days)</div>
+                        <div class="stat-value">{{ maps_created }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Maps Shared (Last 30 Days)</div>
+                        <div class="stat-value">{{ maps_shared }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Avg. Rating</div>
+                        <div class="stat-value">{{ avg_rating }}</div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,4 +1,3 @@
-// Initial setup
 const mapDataElement = document.getElementById("map-data");
 
 const mapId = mapDataElement.getAttribute("data-map-id");
@@ -49,29 +48,23 @@ if (editorsData && editorsData.length > 0) {
     editorsList.appendChild(li);
 }
 
-// Ensure resize popup is properly styled
 const resizePopup = document.getElementById("resize-popup");
 
-// Create link resize popup
 const linkResizePopup = document.createElement("div");
 linkResizePopup.id = "link-resize-popup";
 
-// Create buttons for link resizing
 const increaseLinkButton = document.createElement("button");
 increaseLinkButton.textContent = "+";
 
 const decreaseLinkButton = document.createElement("button");
 decreaseLinkButton.textContent = "-";
 
-// Add buttons to the link resize popup
 linkResizePopup.appendChild(increaseLinkButton);
 linkResizePopup.appendChild(decreaseLinkButton);
 document.body.appendChild(linkResizePopup);
 
-// Event Listeners for Add Node popup
 document.getElementById("add-node-btn").addEventListener("click", function() {
     document.getElementById("node-popup").style.display = "flex";
-    // Clear form fields
     document.getElementById("node-label").value = "";
     document.getElementById("node-description").value = "";
     document.getElementById("node-shape").value = "circle";
@@ -274,39 +267,70 @@ function updateVisualization() {
         }
     });
 
-    nodeEnter.append("text")
+nodeEnter.append("text")
     .attr("class", "node-label")
     .attr("text-anchor", "middle")
-    .attr("dy", 0)
+    .attr("dy", function(d) {
+        return d.shape === "square" ? "-0.5em" : "0";
+    })
     .each(function(d) {
         const self = d3.select(this);
-        const words = d.label.split(/\s+/).reverse();
-        let word;
-        let line = [];
-        let lineNumber = 0;
-        const lineHeight = 1.1; 
-        const y = self.attr("y");
-        const dy = parseFloat(self.attr("dy"));
-        let tspan = self.append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-
+        const words = d.label.split(/\s+/);
+        let lines = [];
+        let currentLine = [];
         const maxWidth = d.shape === "square" 
-            ? (d.size?.width || 60) * 0.8 
-            : (d.size || 35) * 1.5;
+            ? (d.size?.width || 60) * 0.8  // 80% of square width
+            : (d.size || 35) * 1.5;        // 150% of circle radius
+        
+        // Calculate optimal font size based on node size
+        const fontSize = d.shape === "square"
+            ? Math.min(12, (d.size?.width || 60) / 8)  // Adjust these values as needed
+            : Math.min(12, (d.size || 35) / 3);        // Adjust these values as needed
+        
+        self.style("font-size", `${fontSize}px`);
 
-        while (word = words.pop()) {
-            line.push(word);
-            tspan.text(line.join(" "));
+        // Word wrapping logic
+        let tspan = self.append("tspan")
+            .attr("x", 0)
+            .attr("dy", 0);
+
+        words.forEach(word => {
+            currentLine.push(word);
+            tspan.text(currentLine.join(" "));
+            
             if (tspan.node().getComputedTextLength() > maxWidth) {
-                line.pop();
-                tspan.text(line.join(" "));
-                line = [word];
-                tspan = self.append("tspan")
-                    .attr("x", 0)
-                    .attr("y", y)
-                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
-                    .text(word);
+                currentLine.pop();
+                if (currentLine.length > 0) {
+                    lines.push(currentLine.join(" "));
+                }
+                currentLine = [word];
             }
+        });
+        
+        if (currentLine.length > 0) {
+            lines.push(currentLine.join(" "));
         }
+
+        // Clear the temporary tspan
+        self.selectAll("tspan").remove();
+
+        // Calculate total height of text
+        const lineHeight = fontSize * 1.2;  // 120% of font size
+        const totalHeight = lines.length * lineHeight;
+        
+        // Calculate starting y position to center text vertically
+        let startY = d.shape === "square"
+            ? -totalHeight / 2 + lineHeight / 2
+            : -((lines.length - 1) * lineHeight) / 2;
+
+        // Create final tspans
+        lines.forEach((line, i) => {
+            self.append("tspan")
+                .attr("x", 0)
+                .attr("dy", i === 0 ? startY : lineHeight)
+                .text(line)
+                .attr("dominant-baseline", "middle");
+        });
     });
 
     nodeEnter.append("title")
@@ -337,20 +361,15 @@ function updateVisualization() {
     updateSimulationLinks();
 }
 
-// Calculate intersection point of a line and a circle
 function intersectCircleLine(cx, cy, r, x1, y1, x2, y2) {
-    // Vector from line start to circle center
     const dx = x2 - x1;
     const dy = y2 - y1;
     
-    // Calculate distance from point 1 to point 2
     const len = Math.sqrt(dx * dx + dy * dy);
     
-    // Normalize the direction vector
     const nx = dx / len;
     const ny = dy / len;
     
-    // Calculate the intersection point
     const intersectX = cx - r * nx;
     const intersectY = cy - r * ny;
     
