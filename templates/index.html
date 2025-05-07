@@ -6,7 +6,6 @@
     <title>Knowledge Mapping Platform</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Custom styles only for index.html */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -199,7 +198,6 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-container">
             <a href="#" class="navbar-brand">Knowledge Mapping</a>
@@ -215,7 +213,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero-section">
         <div class="hero-container">
             <div class="hero-content">
@@ -228,13 +225,9 @@
                     <a href="{{ url_for('login') }}" class="primary-button">Log In</a>
                 </div>
             </div>
-            <div class="feature-image-container">
-                <img src="/api/placeholder/600/400" alt="Knowledge Map Example" class="feature-image">
-            </div>
         </div>
     </section>
 
-    <!-- Features Section -->
     <section id="features" class="features-section">
         <div class="features-container">
             <h2 class="section-title">Powerful Knowledge Mapping</h2>

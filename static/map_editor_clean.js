@@ -137,7 +137,6 @@ document.getElementById("decrease-size").addEventListener("click", function(even
     }
 });
 
-// Add link resize button event listeners
 increaseLinkButton.addEventListener("click", function(event) {
     event.stopPropagation();
     console.log("Increase link length clicked");
@@ -187,7 +186,6 @@ document.getElementById("view-editors-btn").addEventListener("click", function()
     }
 });
 
-// Copy map ID
 function copyMapId() {
     const mapIdElement = document.getElementById("display-map-id");
     const range = document.createRange();
@@ -199,7 +197,6 @@ function copyMapId() {
     alert('Map ID copied to clipboard!');
 }
 
-// SVG and simulation
 const svg = d3.select("#map-container")
     .append("svg")
     .attr("width", "100%")
@@ -211,11 +208,10 @@ const zoom = d3.zoom()
     .on("zoom", event => svgGroup.attr("transform", event.transform));
 svg.call(zoom);
 
-// Define arrowhead marker
 svg.append("defs").append("marker")
     .attr("id", "arrowhead")
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 15) // Reduced so it appears at the edge of the node
+    .attr("refX", 15) 
     .attr("refY", 0)
     .attr("markerWidth", 6)
     .attr("markerHeight", 6)
@@ -279,17 +275,15 @@ nodeEnter.append("text")
         let lines = [];
         let currentLine = [];
         const maxWidth = d.shape === "square" 
-            ? (d.size?.width || 60) * 0.8  // 80% of square width
-            : (d.size || 35) * 1.5;        // 150% of circle radius
+            ? (d.size?.width || 60) * 0.8  
+            : (d.size || 35) * 1.5;       
         
-        // Calculate optimal font size based on node size
         const fontSize = d.shape === "square"
-            ? Math.min(12, (d.size?.width || 60) / 8)  // Adjust these values as needed
-            : Math.min(12, (d.size || 35) / 3);        // Adjust these values as needed
+            ? Math.min(12, (d.size?.width || 60) / 8) 
+            : Math.min(12, (d.size || 35) / 3);       
         
         self.style("font-size", `${fontSize}px`);
 
-        // Word wrapping logic
         let tspan = self.append("tspan")
             .attr("x", 0)
             .attr("dy", 0);
@@ -311,19 +305,15 @@ nodeEnter.append("text")
             lines.push(currentLine.join(" "));
         }
 
-        // Clear the temporary tspan
         self.selectAll("tspan").remove();
 
-        // Calculate total height of text
-        const lineHeight = fontSize * 1.2;  // 120% of font size
+        const lineHeight = fontSize * 1.2; 
         const totalHeight = lines.length * lineHeight;
         
-        // Calculate starting y position to center text vertically
         let startY = d.shape === "square"
             ? -totalHeight / 2 + lineHeight / 2
             : -((lines.length - 1) * lineHeight) / 2;
 
-        // Create final tspans
         lines.forEach((line, i) => {
             self.append("tspan")
                 .attr("x", 0)
@@ -535,7 +525,6 @@ function nodeClicked(event, node, element) {
         data: node
     };
     
-    // Position the resize popup near the node
     const rect = element.getBoundingClientRect();
     const bodyRect = document.body.getBoundingClientRect();
     
@@ -554,10 +543,8 @@ function nodeClicked(event, node, element) {
 function linkClicked(event, link, element) {
     console.log("Link clicked:", link);
     
-    // Hide node resize popup first
     selectedResizableNode = null;
     
-    // Don't show resize popup if in delete or link mode
     if (isDeleteMode) {
         console.log("Deleting link:", link);
         links = links.filter(l => l !== link);
@@ -576,7 +563,6 @@ function linkClicked(event, link, element) {
         link: link
     };
     
-    // Position the link resize popup at the middle of the link
     const x1 = link.source.x;
     const y1 = link.source.y;
     const x2 = link.target.x;
@@ -585,7 +571,6 @@ function linkClicked(event, link, element) {
     const midX = (x1 + x2) / 2;
     const midY = (y1 + y2) / 2;
     
-    // Calculate screen position from SVG coordinates
     const svgRect = svg.node().getBoundingClientRect();
     const transform = d3.zoomTransform(svg.node());
     
@@ -597,7 +582,6 @@ function linkClicked(event, link, element) {
     linkResizePopup.style.top = `${screenY}px`;
     linkResizePopup.style.display = "block";
 
-    // Stop event propagation
     event.stopPropagation();
 }
 
@@ -653,7 +637,7 @@ document.getElementById('save-map').addEventListener('click', function() {
             mapId,
             nodes: nodes.map(n => {
                 const element = d3.selectAll(".node").filter(d => d === n).node();
-                let size = 35; // default for circles
+                let size = 35;
                 if (n.shape === "circle") {
                     const circle = d3.select(element).select("circle");
                     size = +circle.attr("r");
@@ -751,10 +735,9 @@ rateButton.addEventListener("click", () => {
         return;
     }
     
-    // Get button position for popup positioning
     const rect = rateButton.getBoundingClientRect();
-    ratingPopup.style.left = `${rect.right + 10}px`; // Position to the right of the button
-    ratingPopup.style.top = `${rect.top}px`; // Align with top of button
+    ratingPopup.style.left = `${rect.right + 10}px`;
+    ratingPopup.style.top = `${rect.top}px`;
     ratingPopup.style.display = "block";
 });
 
@@ -776,7 +759,6 @@ document.querySelectorAll("#rating-popup .star").forEach(star => {
     });
 });
 
-// Render number of raters and toggle rater list
 const ratingCountSpan = document.getElementById('rating-count');
 const raterList = document.getElementById('rater-list');
 const raterListItems = document.getElementById('rater-list-items');
@@ -786,7 +768,6 @@ ratingCountSpan.addEventListener('click', () => {
     raterList.style.display = visible ? 'none' : 'block';
 });
 
-// Populate rater list
 const ratersData = JSON.parse(document.getElementById('average-rating-stars').getAttribute('data-raters') || "[]");
 ratersData.forEach(rater => {
     const li = document.createElement('li');

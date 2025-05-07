@@ -6,7 +6,6 @@
     <title>View Knowledge Map</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Custom styles for view_maps.html */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f9fafb;
@@ -222,7 +221,7 @@
 
         @media (max-width: 768px) {
             .maps-grid {
-                grid-template-columns: 1fr; /* mobile: 1 card per row */
+                grid-template-columns: 1fr; 
             }
         
             .header-container {
@@ -238,7 +237,6 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-container">
             <a href="{{ url_for('dashboard') }}" class="navbar-brand">Knowledge Mapping</a>
@@ -249,7 +247,6 @@
         </div>
     </nav>
 
-    <!-- Map List -->
     <div class="container">
         <div class="header-container">
             <h1 class="page-title">Your Knowledge Maps</h1>
@@ -260,7 +257,6 @@
             <div class="map-card">
                 <div class="map-header">
                     <h2 class="map-title">{{ map.title if map.title else map[1] }}</h2>
-                    <!-- Rating display -->
                     <div class="rating-container">
                         <div class="star-rating">
                             <span class="{{ 'filled' if (map.avg_rating if map.avg_rating else map[3] or 0) >= 1 else '' }}">★</span>
@@ -274,7 +270,6 @@
                 </div>
                 <p class="map-description">{{ map.description if map.description else map[2] }}</p>
                 
-                <!-- Buttons for Open and Delete -->
                 <div class="map-actions">
                     <a href="{{ url_for('map_editor', map_id=map.map_id if map.map_id else map[0]) }}" 
                     class="open-button">Open</a>
@@ -286,7 +281,6 @@
         </div>
     </div>
 
-    <!-- Delete Map Script -->
     <script>
     function deleteMap(mapId) {
         if (!confirm("Are you sure you want to delete this map? This action cannot be undone.")) {
@@ -302,7 +296,7 @@
         .then(data => {
             if (data.message) {
                 alert("Map deleted successfully!");
-                location.reload(); // Refresh the list
+                location.reload();
             } else {
                 alert("Failed to delete map.");
             }

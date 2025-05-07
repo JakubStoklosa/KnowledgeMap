@@ -3,14 +3,13 @@ body {
     height: 100vh;
     display: flex;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: white; /* Change from #f9fafb to white */
+    background-color: white; 
     color: #2c3e50;
 }
 
-/* Sidebar/Control Panel */
 .sidebar, #control-panel {
     width: 260px;
-    min-width: 260px; /* Add this to prevent shrinking */
+    min-width: 260px; 
     background: #ffffff;
     padding: 20px;
     border-right: 1px solid #e2e8f0;
@@ -20,8 +19,8 @@ body {
     box-sizing: border-box;
     box-shadow: 0 0 20px rgba(0,0,0,0.05);
     overflow-y: auto;
-    height: 100vh; /* Ensure it takes full height */
-    position: fixed; /* Fix it to the left side */
+    height: 100vh; 
+    position: fixed; 
     left: 0;
     top: 0;
     z-index: 100;
@@ -34,7 +33,6 @@ body {
     font-size: 18px;
 }
 
-/* Control Section */
 .control-section {
     background-color: #f8fafc;
     padding: 15px;
@@ -43,7 +41,6 @@ body {
     margin-bottom: 15px;
 }
 
-/* Toggle Switch */
 .toggle-container {
     display: flex;
     align-items: center;
@@ -178,7 +175,6 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
-/* Form group */
 .form-group {
     margin-bottom: 12px;
 }
@@ -349,23 +345,20 @@ input:checked + .slider:before {
     box-shadow: 0 4px 8px rgba(243, 156, 18, 0.3);
 }
 
-/* Remove any custom class styling that might override these */
 .primary-button, .secondary-button {
-    /* Reset any custom styling */
     background-color: inherit;
     color: inherit;
 }
 
 .main-content {
     flex: 1;
-    margin-left: 260px; /* Push content to the right of sidebar */
+    margin-left: 260px; 
     width: calc(100% - 260px);
     height: 100vh;
     position: relative;
 }
 
 
-/* Top Bar */
 .top-bar {
     position: fixed;
     top: 10px;
@@ -395,7 +388,6 @@ input:checked + .slider:before {
     margin-top: 0;
 }
 
-/* Map ID Display */
 #author-name-display,
 #map-id-display {
     position: absolute;
@@ -444,7 +436,6 @@ input:checked + .slider:before {
     box-shadow: 0 4px 8px rgba(33, 150, 83, 0.3) !important;
 }
 
-/* Map Container */
 #map-container {
     margin-left: 260px;
     width: calc(100% - 260px);
@@ -453,19 +444,16 @@ input:checked + .slider:before {
     border-top: 1px solid #e2e8f0;
 }
 
-/* Links */
 .link {
     stroke: #4a5568;
     stroke-opacity: 0.6;
     stroke-width: 2px;
 }
 
-/* SVG */
 svg {
     overflow: visible;
 }
 
-/* View Editors Button */
 #view-editors-btn {
     position: static;
     top: 50px;
@@ -481,8 +469,8 @@ svg {
     font-weight: 600;
     transition: all 0.2s ease;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Match other sidebar buttons */
-    margin-top: 5px; /* Add some spacing */
+    width: 100%; 
+    margin-top: 5px; 
 }
 
 #view-editors-btn:hover {
@@ -510,7 +498,6 @@ svg {
     color: #4a5568;
 }
 
-/* Zoom Controls */
 #zoom-controls {
     position: fixed;
     bottom: 20px;
@@ -540,7 +527,6 @@ svg {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Back to Maps Button */
 #back-to-maps-container {
     position: fixed;
     bottom: 20px;
@@ -570,7 +556,6 @@ svg {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Resize Popups */
 #resize-popup,
 #link-resize-popup {
     position: absolute;
@@ -607,7 +592,6 @@ svg {
     color: #4a5568;
 }
 
-/* Rating System */
 #rating-container {
     position: absolute;
     top: 70px;
@@ -667,8 +651,8 @@ svg {
     font-weight: 600;
     transition: all 0.2s ease;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Match other sidebar buttons */
-    margin-top: 5px; /* Add some spacing */
+    width: 100%; 
+    margin-top: 5px;
 }
 
 #rate-map-btn:hover {
@@ -729,7 +713,6 @@ svg {
     color: #4a5568;
 }
 
-/* Map Cards */
 .map-card {
     background-color: white;
     padding: 1.5rem;
@@ -757,7 +740,6 @@ svg {
     line-height: 1.6;
 }
 
-/* Star Rating */
 .star-rating {
     color: #e2e8f0;
     font-size: 1.25rem;
@@ -768,7 +750,6 @@ svg {
     color: #f39c12;
 }
 
-/* Error message */
 .error-message {
     color: #e53e3e;
     margin-top: 16px;
@@ -780,7 +761,6 @@ svg {
     border-left: 3px solid #e53e3e;
 }
 
-/* Legend styles */
 .legend-item {
     display: flex;
     align-items: center;

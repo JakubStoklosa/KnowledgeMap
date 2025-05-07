@@ -7,7 +7,6 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Custom styles for dashboard.html */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f9fafb;
@@ -89,7 +88,6 @@
             gap: 2rem;
         }
 
-        /* Admin dashboard changes - 3 columns for admin */
         .admin-dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -256,7 +254,6 @@
             font-style: italic;
         }
 
-        /* Admin section badge */
         .admin-badge {
             background-color: #e74c3c;
             color: white;
@@ -281,7 +278,6 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <a href="#" class="navbar-brand">Knowledge Mapping</a>
         <div>
@@ -289,7 +285,6 @@
         </div>
     </nav>
 
-    <!-- Dashboard Content -->
     <div class="container">
         <h1 class="page-title">
             Welcome, {{ current_user.username }}
@@ -299,22 +294,18 @@
         </h1>
         
         {% if current_user.username == 'Admin' %}
-        <!-- Admin Dashboard with 3 columns -->
         <div class="admin-dashboard-grid">
             <div class="dashboard-section">
                 <h2 class="section-title">Your Maps</h2>
                 <div class="action-buttons">
-                    <!-- Option to view personal knowledge maps -->
                     <div>
                         <a href="{{ url_for('view_personal_maps') }}" class="primary-button">View Your Knowledge Maps</a>
                     </div>
 
-                    <!-- Option to create a new knowledge map -->
                     <div>
                         <a href="{{ url_for('create_knowledge_map') }}" class="success-button">Create a New Knowledge Map</a>
                     </div>
 
-                    <!-- Option to view other members' knowledge maps by ID -->
                     <div>
                         <a href="{{ url_for('enter_map_id') }}" class="warning-button">Enter a Map ID</a>
                     </div>
@@ -344,7 +335,6 @@
                 {% endif %}
             </div>
 
-            <!-- Admin Section -->
             <div class="dashboard-section">
                 <h2 class="section-title">Admin Controls</h2>
                 <div class="action-buttons">
@@ -361,22 +351,16 @@
             </div>
         </div>
         {% else %}
-        <!-- Regular Dashboard with 2 columns -->
         <div class="dashboard-grid">
             <div class="dashboard-section">
                 <h2 class="section-title">Your Maps</h2>
                 <div class="action-buttons">
-                    <!-- Option to view personal knowledge maps -->
                     <div>
                         <a href="{{ url_for('view_personal_maps') }}" class="primary-button">View Your Knowledge Maps</a>
                     </div>
-
-                    <!-- Option to create a new knowledge map -->
                     <div>
                         <a href="{{ url_for('create_knowledge_map') }}" class="success-button">Create a New Knowledge Map</a>
                     </div>
-
-                    <!-- Option to view other members' knowledge maps by ID -->
                     <div>
                         <a href="{{ url_for('enter_map_id') }}" class="warning-button">Enter a Map ID</a>
                     </div>

@@ -6,7 +6,6 @@
     <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Custom styles for login.html */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #f9f9fb 0%, #e6f7ff 100%);
@@ -198,7 +197,6 @@
     <div class="auth-container">
         <h1 class="auth-title">Login to Your Account</h1>
         
-        <!-- Display flash messages here -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <ul class="flash-messages">

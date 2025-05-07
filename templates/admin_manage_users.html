@@ -96,7 +96,6 @@
                 border-bottom: 2px solid #e2e8f0;
             }
         
-            /* Users table styles */
             .users-table {
                 width: 100%;
                 border-collapse: collapse;
@@ -129,12 +128,10 @@
                 background-color: #f8fafc;
             }
         
-            /* Action buttons column always right-aligned */
             .users-table td.actions-cell {
                 text-align: right;
             }
             
-            /* Modal styles */
             .modal {
                 display: none;
                 position: fixed;
@@ -194,7 +191,6 @@
                 cursor: pointer;
             }
         
-            /* Button styles */
             .button {
                 padding: 0.5rem 1rem;
                 border-radius: 6px;
@@ -323,7 +319,6 @@
         </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-container">
             <a href="{{ url_for('dashboard') }}" class="navbar-brand">Knowledge Mapping</a>
@@ -334,7 +329,6 @@
         </div>
     </nav>
 
-    <!-- Admin Content -->
     <div class="container">
         <h1 class="page-title">Manage Users</h1>
         
@@ -388,7 +382,6 @@
     <div id="successNotification" class="notification"></div>
 
 
-    <!-- Confirmation Modal -->
     <div id="deleteModal" class="modal">
         <div class="modal-content">
             <h2 class="modal-title">Delete User</h2>
@@ -403,18 +396,16 @@
     </div>
 
     <script>
-        let deletingUsername = ''; // Store username for success message
+        let deletingUsername = ''; 
     
         function confirmDelete(userId, username) {
             deletingUsername = username;
             document.getElementById('deleteUsername').textContent = username;
             document.getElementById('deleteModal').style.display = 'block';
             
-            // Update form handler
             const form = document.getElementById('deleteForm');
             form.action = `/admin/delete_user/${userId}`;
             
-            // Set up the form submission handler
             form.onsubmit = async function(e) {
                 e.preventDefault();
                 
@@ -432,14 +423,12 @@
                         showSuccessMessage(`User ${deletingUsername} has been deleted successfully.`);
                         closeModal();
                         
-                        // Remove the user's row
                         const userRow = document.querySelector(`tr[data-user-id="${userId}"]`);
                         if (userRow) {
                             userRow.remove();
                             updateUserCount();
                         }
     
-                        // Reload page after delay
                         setTimeout(() => {
                             window.location.reload();
                         }, 2000);
@@ -485,14 +474,12 @@
             userCount.textContent = `Showing ${currentCount} users`;
         }
         
-        // Close modal when clicking outside
         window.onclick = function(event) {
             if (event.target === document.getElementById('deleteModal')) {
                 closeModal();
             }
         }
     
-        // Handle any Flask flash messages on page load
         document.addEventListener('DOMContentLoaded', function() {
             const flashMessages = document.querySelectorAll('.flash-message');
             flashMessages.forEach(message => {

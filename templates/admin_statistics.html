@@ -92,7 +92,6 @@
             vertical-align: middle;
         }
 
-        /* New stats panels layout */
         .stats-panels-container {
             display: flex;
             gap: 1.5rem;
@@ -207,7 +206,6 @@
             border-left: 4px solid #eab308;
         }
 
-        /* Responsive adjustments */
         @media (max-width: 768px) {
             .stats-panels-container {
                 flex-direction: column;
@@ -220,7 +218,6 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-container">
             <a href="{{ url_for('dashboard') }}" class="navbar-brand">Knowledge Mapping</a>
@@ -231,7 +228,6 @@
         </div>
     </nav>
 
-    <!-- Admin Content -->
     <div class="container">
         <h1 class="page-title">
             System Statistics
@@ -242,7 +238,6 @@
             &larr; Back to Dashboard
         </a>
 
-        <!-- New side-by-side layout for stats panels -->
         <div class="stats-panels-container">
             <div class="stats-panel">
                 <h2 class="stats-section-title">User Statistics</h2>

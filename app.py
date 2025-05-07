@@ -215,7 +215,6 @@ def admin_delete_user(user_id):
     cur = conn.cursor()
 
     try:
-        # Get username before deletion for the success message
         cur.execute("SELECT username FROM users WHERE id = %s", (user_id,))
         user_result = cur.fetchone()
         if not user_result:
@@ -226,7 +225,6 @@ def admin_delete_user(user_id):
         
         username = user_result[0]
 
-        # First, delete all maps and related data
         cur.execute("SELECT map_id FROM maps WHERE user_id = %s", (user_id,))
         map_ids = [row[0] for row in cur.fetchall()]
         
@@ -237,7 +235,6 @@ def admin_delete_user(user_id):
             cur.execute("DELETE FROM ratings WHERE map_id = %s", (map_id,))
             cur.execute("DELETE FROM maps WHERE map_id = %s", (map_id,))
 
-        # Then delete user-related data
         cur.execute("DELETE FROM shared_maps WHERE shared_with_id = %s", (user_id,))
         cur.execute("DELETE FROM ratings WHERE user_id = %s", (user_id,))
         cur.execute("DELETE FROM editors WHERE user_id = %s", (user_id,))

@@ -6,7 +6,6 @@
     <title>Maps Shared With Me</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Custom styles matching view_maps.html */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f9fafb;
@@ -242,7 +241,6 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-container">
             <a href="{{ url_for('dashboard') }}" class="navbar-brand">Knowledge Mapping</a>
@@ -253,7 +251,6 @@
         </div>
     </nav>
 
-    <!-- Map List -->
     <div class="container">
         <div class="header-container">
             <h1 class="page-title">Maps Shared With Me</h1>
@@ -265,7 +262,6 @@
                 <div class="map-card">
                     <div class="map-header">
                         <h2 class="map-title">{{ map.title }}</h2>
-                        <!-- Rating display -->
                         <div class="rating-container">
                             <div class="star-rating">
                                 <span class="{{ 'filled' if map.avg_rating and map.avg_rating >= 1 else '' }}">★</span>
@@ -280,7 +276,6 @@
                     <p class="map-description">{{ map.description }}</p>
                     <p class="map-author">Shared by: {{ map.username }}</p>
                     
-                    <!-- Open Button -->
                     <div class="map-actions">
                         <a href="{{ url_for('map_editor', map_id=map.map_id) }}" class="open-button">Open</a>
                     </div>

@@ -6,7 +6,6 @@
     <title>Admin - Manage Maps</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Custom styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f9fafb;
@@ -253,7 +252,6 @@
             border-left: 4px solid #dc2626;
         }
 
-        /* Confirmation modal */
         .modal {
             display: none;
             position: fixed;
@@ -322,7 +320,6 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-container">
             <a href="{{ url_for('dashboard') }}" class="navbar-brand">Knowledge Mapping</a>
@@ -333,9 +330,7 @@
         </div>
     </nav>
 
-    <!-- Admin Content -->
     <div class="container">
-        <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <ul class="flash-messages">
@@ -390,7 +385,6 @@
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
     <div id="deleteModal" class="modal">
         <div class="modal-content">
             <h2 class="modal-title">Delete Map</h2>
@@ -415,7 +409,6 @@
             document.getElementById('deleteModal').style.display = 'none';
         }
         
-        // Close modal when clicking outside
         window.onclick = function(event) {
             if (event.target == document.getElementById('deleteModal')) {
                 closeModal();
